@@ -20,13 +20,13 @@
   --accent-light:#e8f0fb;    /* Blue-50    – subtle bg       */
   --accent-mid:#b8cfe8;      /* Blue-200   – border tint     */
 
-  --warn:#b45309;            /* Amber-700  – planned/warn    */
-  --warn-light:#fdf6e8;      /* Amber-50                     */
+  --warn:#c47d2a;            /* Amber-700  – planned/warn    */
+  --warn-light:#fdf3e4;      /* Amber-50                     */
 
-  --danger:#c0392b;          /* Red-700    – overdue/urgent  */
+  --danger:#b94040;          /* Red-700    – overdue/urgent  */
   --danger-light:#fdf0ee;    /* Red-50                       */
 
-  --success:#1a7a5e;         /* Teal-700   – paid            */
+  --success:#2a8a78;         /* Teal-700   – paid            */
 
   --text:#0d1e2e;            /* Navy-900                     */
   --text2:#2d4158;           /* Navy-700                     */
@@ -48,7 +48,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 .logo-sub{font-size:10.5px;color:rgba(255,255,255,.35);margin-top:3px;letter-spacing:.2px}
 nav{flex:1;padding:14px 10px;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
 .nav-section{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,.25);padding:12px 8px 5px}
-.nav-item{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;color:rgba(255,255,255,.52);transition:all .15s;border:1px solid transparent}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;color:rgba(255,255,255,.58);transition:all .15s;border:1px solid transparent}
 .nav-item:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.88)}
 .nav-item.active{background:rgba(37,99,168,.22);color:#90b8e0;font-weight:600;border-color:rgba(37,99,168,.32)}
 .nav-icon{font-size:14px;width:18px;text-align:center;opacity:.85}
@@ -64,7 +64,7 @@ nav{flex:1;padding:14px 10px;display:flex;flex-direction:column;gap:2px;overflow
 .main{margin-left:var(--sidebar-w);padding:28px 32px;min-height:100vh}
 .page{display:none}.page.active{display:block;animation:fadeUp .22s ease}
 .page-header{margin-bottom:24px;display:flex;align-items:flex-end;justify-content:space-between}
-.page-eyebrow{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.4px;color:var(--accent);margin-bottom:5px;opacity:.8}
+.page-eyebrow{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted-light);margin-bottom:5px}
 .page-title{font-size:23px;font-weight:800;color:var(--text);letter-spacing:-.5px}
 .page-subtitle{font-size:12px;color:var(--muted);margin-top:4px}
 .header-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:var(--surface);border:1px solid var(--border);border-radius:20px;font-size:11px;color:var(--muted);box-shadow:var(--shadow-sm)}
@@ -80,7 +80,7 @@ nav{flex:1;padding:14px 10px;display:flex;flex-direction:column;gap:2px;overflow
 
 /* ── CHARTS ── */
 .charts-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
-.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 22px;box-shadow:var(--shadow-sm)}
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 22px;box-shadow:var(--shadow-sm);transition:box-shadow .2s}
 .chart-title{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.1px;color:var(--muted);margin-bottom:16px}
 
 /* ── TABLE CARD ── */
@@ -124,11 +124,11 @@ tr.total-row td.total-amt.amt-pending{color:var(--accent)}
 
 /* ── BADGES ── */
 .badge{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.2px}
-.badge-paid{background:#d4f0e8;color:#1a7a5e}
+.badge-paid{background:#d4ede6;color:#2a8a78}
 .badge-pending{background:var(--accent-light);color:#1a4a7a}
-.badge-overdue{background:var(--danger-light);color:#922b21}
+.badge-overdue{background:var(--danger-light);color:#8c3030}
 .badge-blocked{background:#f1f5f9;color:#475569}
-.badge-duesoon{background:#fdf3e0;color:#8c4a0e}
+.badge-duesoon{background:#fdf3e0;color:#8a4a18}
 
 /* ── AGING ── */
 .aging-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:22px}
@@ -195,7 +195,7 @@ nav{flex:1;padding:14px 10px;display:flex;flex-direction:column;gap:2px;overflow
 
 /* ── CHARTS ── */
 .charts-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
-.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 22px;box-shadow:var(--shadow-sm)}
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 22px;box-shadow:var(--shadow-sm);transition:box-shadow .2s}
 .chart-title{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.1px;color:var(--muted);margin-bottom:16px}
 
 /* ── TABLE CARD ── */
@@ -234,16 +234,16 @@ tr.total-row td.total-amt{
   font-size:14px;font-weight:800;text-align:right;padding-right:16px;letter-spacing:-.3px
 }
 tr.total-row td.total-amt.amt-total{color:var(--text)}
-tr.total-row td.total-amt.amt-paid{color:#c0392b}
+tr.total-row td.total-amt.amt-paid{color:#b94040}
 tr.total-row td.total-amt.amt-pending{color:var(--accent)}
 
 /* ── BADGES ── */
 .badge{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.2px}
-.badge-paid{background:#d4f0e8;color:#1a7a5e}
+.badge-paid{background:#d4ede6;color:#2a8a78}
 .badge-pending{background:#e8f0fb;color:#1a4a7a}
-.badge-overdue{background:#fff1f2;color:#922b21}
+.badge-overdue{background:#fff1f2;color:#8c3030}
 .badge-blocked{background:#e2e8f0;color:#475569}
-.badge-duesoon{background:#fdf3e0;color:#8c4a0e}
+.badge-duesoon{background:#fdf3e0;color:#8a4a18}
 
 /* ── AGING ── */
 .aging-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:22px}
@@ -708,9 +708,9 @@ function renderOverview(data){
   var considerCount=data.filter(function(d){return d.priority.indexOf('Consider')>=0&&d.status!=='Paid';}).length;
   document.getElementById('execKpiGrid').innerHTML=[
     {label:'Total AP Outstanding',icon:'💰',border:'#2563a8',bg:'linear-gradient(135deg,#1e3a5f,#2563a8)',value:fmtK(totalAP),pct:null,meta:pendingCount+' invoices · '+suppliers.length+' suppliers',color:'#fff',heroCard:true},
-    {label:'Urgent — Action Required',icon:'🚨',border:'#c0392b',bg:'#fff',value:fmtK(urgentAmt),pct:totalAP>0?(urgentAmt/totalAP*100).toFixed(1)+'%':null,meta:urgentCount+' invoices',color:'#c0392b',heroCard:false},
-    {label:'Planned — Due Soon',icon:'📋',border:'#ca8a04',bg:'#fff',value:fmtK(plannedAmt),pct:totalAP>0?(plannedAmt/totalAP*100).toFixed(1)+'%':null,meta:plannedCount+' invoices',color:'#b45309',heroCard:false},
-    {label:'Consider — Under Review',icon:'💡',border:'#0f766e',bg:'#fff',value:fmtK(considerAmt),pct:totalAP>0?(considerAmt/totalAP*100).toFixed(1)+'%':null,meta:considerCount+' invoices',color:'#0f766e',heroCard:false}
+    {label:'Urgent — Action Required',icon:'🚨',border:'#b94040',bg:'#fff',value:fmtK(urgentAmt),pct:totalAP>0?(urgentAmt/totalAP*100).toFixed(1)+'%':null,meta:urgentCount+' invoices',color:'#b94040',heroCard:false},
+    {label:'Planned — Due Soon',icon:'📋',border:'#c47d2a',bg:'#fff',value:fmtK(plannedAmt),pct:totalAP>0?(plannedAmt/totalAP*100).toFixed(1)+'%':null,meta:plannedCount+' invoices',color:'#c47d2a',heroCard:false},
+    {label:'Consider — Under Review',icon:'💡',border:'#2a8a78',bg:'#fff',value:fmtK(considerAmt),pct:totalAP>0?(considerAmt/totalAP*100).toFixed(1)+'%':null,meta:considerCount+' invoices',color:'#2a8a78',heroCard:false}
   ].map(function(k){
     if(k.heroCard){
       return '<div style="background:'+k.bg+';border-radius:14px;padding:22px 24px;position:relative;overflow:hidden;box-shadow:0 8px 24px rgba(37,99,168,.25)">'+
@@ -732,7 +732,7 @@ function renderOverview(data){
   }).join('');
 
   // Priority donut
-  var pColors=['#c0392b','#ca8a04','#0f766e','#64748b'];
+  var pColors=['#b94040','#c47d2a','#2a8a78','#7a8fa0'];
   var pLabels=['🔴 Urgent','🟠 Planned','🟢 Consider','⚫ Blocked'];
   var pVals=[urgentAmt,plannedAmt,considerAmt,blockedAmt];
   var pTotal=pVals.reduce(function(a,b){return a+b;},0);
@@ -785,8 +785,8 @@ function renderOverview(data){
   trendChartInst=new Chart(document.getElementById('trendChart'),{
     type:'bar',
     data:{labels:tK,datasets:[
-      {label:'Total Invoiced',data:tK.map(function(k){return mT[k].total;}),backgroundColor:'#b8cfe8',borderWidth:0,borderRadius:4,order:2},
-      {label:'Paid',data:tK.map(function(k){return mT[k].paid;}),backgroundColor:'#2563a8',borderWidth:0,borderRadius:4,order:1}
+      {label:'Total Invoiced',data:tK.map(function(k){return mT[k].total;}),backgroundColor:'rgba(37,99,168,.15)',borderWidth:0,borderRadius:5,order:2},
+      {label:'Paid',data:tK.map(function(k){return mT[k].paid;}),backgroundColor:'rgba(37,99,168,.78)',borderWidth:0,borderRadius:5,order:1}
     ]},
     options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
       plugins:{legend:{position:'top',align:'end',labels:{font:chartFont,usePointStyle:true,pointStyle:'circle',padding:14}}},
@@ -800,7 +800,7 @@ function renderOverview(data){
   var bannerHtml='';
   if(odItems.length>0){
     var deep=odItems.filter(function(d){var ms=parseDateMs(d.dueDate);return ms&&(now.getTime()-ms)/86400000>45;});
-    bannerHtml='<div style="background:linear-gradient(135deg,#c0392b,#a93226);border-radius:12px;padding:16px 22px;color:#fff;display:flex;align-items:center;gap:16px;flex-wrap:wrap;box-shadow:0 6px 20px rgba(192,57,43,.2)">'+
+    bannerHtml='<div style="background:linear-gradient(135deg,#b94040,#9e3535);border-radius:12px;padding:16px 22px;color:#fff;display:flex;align-items:center;gap:16px;flex-wrap:wrap;box-shadow:0 6px 20px rgba(185,64,64,.2)">'+
       '<div style="font-size:22px">⚠️</div><div style="flex:1">'+
       '<div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:1px;opacity:.75;margin-bottom:3px">Overdue Risk Alert</div>'+
       '<div style="font-size:13px;font-weight:500">'+odItems.length+' invoice(s) overdue · Total: <strong>'+fmtK(overdueAmt)+'</strong>'+
@@ -821,8 +821,8 @@ function renderOverview(data){
   document.getElementById('urgentTableBody').innerHTML=aItems.map(function(d){
     var dueMs=parseDateMs(d.dueDate);
     var aging='—';
-    if(dueMs){var diff=Math.round((now.getTime()-dueMs)/86400000);aging=diff>0?'<span style="color:#c0392b;font-weight:700">+'+diff+'d overdue</span>':'<span style="color:#0f766e;font-weight:600">'+Math.abs(diff)+'d left</span>';}
-    var amtC=d.status==='Overdue'?'#c0392b':d.status==='Due Soon'?'#ca8a04':'var(--text)';
+    if(dueMs){var diff=Math.round((now.getTime()-dueMs)/86400000);aging=diff>0?'<span style="color:#b94040;font-weight:700">+'+diff+'d overdue</span>':'<span style="color:#2a8a78;font-weight:600">'+Math.abs(diff)+'d left</span>';}
+    var amtC=d.status==='Overdue'?'#b94040':d.status==='Due Soon'?'#c47d2a':'var(--text)';
     return '<tr>'+
       '<td class="tbl-supplier">'+d.supplier+'</td>'+
       '<td class="tbl-inv">'+d.inv+'</td>'+
@@ -890,13 +890,13 @@ function applyMonthlyFilter(){
       '<div style="font-size:11px;color:var(--muted);margin-top:5px">'+data.length+' invoices</div>'+
     '</div>'+
     // Card 2: Total Paid
-    '<div style="background:#fff;border:1px solid var(--border);border-left:4px solid #0f766e;border-radius:12px;padding:20px 22px;box-shadow:var(--shadow-sm)">'+
+    '<div style="background:#fff;border:1px solid var(--border);border-left:4px solid #2a8a78;border-radius:12px;padding:20px 22px;box-shadow:var(--shadow-sm)">'+
       '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px">✅ Total Paid</div>'+
-      '<div style="font-size:30px;font-weight:800;color:#0f766e;letter-spacing:-.6px">'+fmtK(tPaidKpi)+'</div>'+
+      '<div style="font-size:30px;font-weight:800;color:#2a8a78;letter-spacing:-.6px">'+fmtK(tPaidKpi)+'</div>'+
       '<div style="font-size:11px;color:var(--muted);margin-top:5px">'+(tInvoice>0?'~'+(tPaidKpi/tInvoice*100).toFixed(1)+'% of total invoiced':'—')+'</div>'+
     '</div>'+
     // Card 3: Total Pending (with breakdown)
-    '<div style="background:linear-gradient(135deg,#c0392b,#a93226);border-radius:12px;padding:20px 22px;box-shadow:0 6px 20px rgba(192,57,43,.2);position:relative;overflow:hidden">'+
+    '<div style="background:linear-gradient(135deg,#b94040,#9e3535);border-radius:12px;padding:20px 22px;box-shadow:0 6px 20px rgba(185,64,64,.2);position:relative;overflow:hidden">'+
       '<div style="position:absolute;right:-8px;top:-8px;font-size:52px;opacity:.12">⏳</div>'+
       '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,.65);margin-bottom:8px">⏳ Total Pending</div>'+
       '<div style="font-size:30px;font-weight:800;color:#fff;letter-spacing:-.6px;margin-bottom:10px">'+fmtK(total)+'</div>'+
@@ -924,14 +924,14 @@ function applyMonthlyFilter(){
     return (parseDateMs(a.dueDate)||9999999999999)-(parseDateMs(b.dueDate)||9999999999999);
   });
   document.getElementById('monthlyTableBody').innerHTML=data.map(function(d,i){
-    var amtC=d.status==='Overdue'?'#c0392b':d.status==='Due Soon'?'#ca8a04':'var(--text)';
+    var amtC=d.status==='Overdue'?'#b94040':d.status==='Due Soon'?'#c47d2a':'var(--text)';
     return '<tr>'+
       '<td style="color:var(--muted);font-size:11px;text-align:right;width:32px">'+(i+1)+'</td>'+
       '<td class="tbl-supplier">'+d.supplier+'</td>'+
       '<td class="tbl-inv">'+d.inv+'</td>'+
       '<td class="tbl-date">'+d.dueDate+'</td>'+
       '<td class="amt">'+fmt(d.amount)+'</td>'+
-      '<td class="amt" style="color:#c0392b;font-weight:500">'+(d.paid>0?'−'+fmt(d.paid):'$0')+'</td>'+
+      '<td class="amt" style="color:#b94040;font-weight:500">'+(d.paid>0?'−'+fmt(d.paid):'$0')+'</td>'+
       '<td class="amt" style="color:#2563a8;font-weight:600">'+(d.pending>0?fmt(d.pending):'$0')+'</td>'+
       '<td class="center">'+badge(d.status)+'</td>'+
       '<td style="white-space:nowrap">'+d.priority+'</td>'+
@@ -1021,11 +1021,11 @@ function renderAging(){
   if(agingSupInst){agingSupInst.destroy();agingSupInst=null;}
   var now=new Date().getTime();
   var bDefs=[
-    {label:'Not Yet Due',hex:'#2563a8',items:[]},
-    {label:'0–30 Days OD',hex:'#ca8a04',items:[]},
-    {label:'31–60 Days OD',hex:'#c0392b',items:[]},
-    {label:'61–90 Days OD',hex:'#7f1d1d',items:[]},
-    {label:'Blocked / N/A',hex:'#94a3b8',items:[]}
+    {label:'Not Yet Due',hex:'#4a82c0',items:[]},
+    {label:'0–30 Days OD',hex:'#c47d2a',items:[]},
+    {label:'31–60 Days OD',hex:'#b94040',items:[]},
+    {label:'61–90 Days OD',hex:'#8c2a2a',items:[]},
+    {label:'Blocked / N/A',hex:'#8a9fb0',items:[]}
   ];
   allData.filter(function(d){return d.pending>0;}).forEach(function(d){
     if(d.status==='Blocked'||d.dueDate==='—'){bDefs[4].items.push(d);return;}
@@ -1072,7 +1072,7 @@ function renderAging(){
   var pRows=allData.filter(function(d){return d.pending>0;});
   var sOut=[];pRows.forEach(function(d){if(sOut.indexOf(d.supplier)<0) sOut.push(d.supplier);});
   var sVals=sOut.map(function(s){return pRows.filter(function(d){return d.supplier===s;}).reduce(function(a,d){return a+d.pending;},0);});
-  var bP=['#0f2a45','#1a4a7a','#2563a8','#4a82c0','#7aaad8','#a8c8e0','#cce0f0','#e4f0f8'];
+  var bP=['#2563a8','#4a82c0','#6a9fd0','#8abce0','#a8cee8','#c0daf0','#d8ecf8','#edf5fc'];
   agingSupInst=new Chart(document.getElementById('agingSupplier'),{
     type:'bar',
     data:{labels:sOut.map(function(s){return s.length>22?s.slice(0,20)+'…':s;}),datasets:[{label:'Outstanding USD',data:sVals,backgroundColor:sOut.map(function(s,i){return bP[i%bP.length];}),borderWidth:0,borderRadius:3}]},
@@ -1082,7 +1082,7 @@ function renderAging(){
   document.getElementById('agingTableBody').innerHTML=allData.filter(function(d){return d.pending>0;}).map(function(d){
     var dueMs=parseDateMs(d.dueDate);var dH='<span style="color:var(--muted)">N/A</span>';var bB=badge('Blocked');
     if(dueMs){var diff=Math.round((new Date().getTime()-dueMs)/86400000);
-      dH='<span style="color:'+(diff>0?'#c0392b':'#0f766e')+';font-weight:700">'+( diff>0?'+':'')+diff+' days</span>';
+      dH='<span style="color:'+(diff>0?'#b94040':'#2a8a78')+';font-weight:700">'+( diff>0?'+':'')+diff+' days</span>';
       bB=diff>60?'<span class="badge badge-overdue">61–90 days</span>':diff>30?'<span class="badge badge-overdue">31–60 days</span>':diff>0?'<span class="badge badge-overdue">0–30 days OD</span>':diff>-7?'<span class="badge badge-duesoon">Due Soon</span>':'<span class="badge badge-pending">Not Yet Due</span>';
     }
     return '<tr>'+
@@ -1110,7 +1110,7 @@ function renderDetailTable(data){
       '<td class="tbl-date">'+d.invDate+'</td>'+
       '<td class="tbl-date">'+d.dueDate+'</td>'+
       '<td class="amt">'+fmt(d.amount)+'</td>'+
-      '<td class="amt" style="color:#c0392b;font-weight:500">'+(d.paid>0?'−'+fmt(d.paid):'$0')+'</td>'+
+      '<td class="amt" style="color:#b94040;font-weight:500">'+(d.paid>0?'−'+fmt(d.paid):'$0')+'</td>'+
       '<td class="amt" style="color:'+(d.pending>0?'#2563a8':'var(--muted)')+'">'+fmt(d.pending)+'</td>'+
       '<td class="center">'+badge(d.status)+'</td>'+
       '<td style="white-space:nowrap">'+d.priority+'</td>'+
