@@ -8,30 +8,30 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root{
-  /* ── Professional palette: Cool Blue · Slate ── */
-  --bg:#edf1f7;
+  /* ── 5-colour palette: Slate · Indigo · Amber · Rose · White ── */
+  --bg:#f1f5f9;
   --surface:#ffffff;
-  --surface2:#f4f7fb;
-  --surface3:#edf1f7;
-  --border:#d0dcef;          /* Secondary bar colour        */
-  --border-light:#e8eef7;
+  --surface2:#f8fafc;
+  --surface3:#f1f5f9;
+  --border:#e2e8f0;
+  --border-light:#f1f5f9;
 
-  --accent:#5b7fd4;          /* Primary blue (softer)       */
-  --accent-light:#eaf0fb;    /* Subtle bg tint              */
-  --accent-mid:#d0dcef;      /* Border tint                 */
+  --accent:#5b7fd4;          /* Indigo-600  – primary action */
+  --accent-light:#eaf0fb;    /* Indigo-50   – subtle bg     */
+  --accent-mid:#d0dcef;      /* Indigo-200  – border tint   */
 
-  --warn:#c07a1a;            /* Amber – planned/warn        */
-  --warn-light:#fdf6e8;
+  --warn:#ca8a04;            /* Amber-600   – planned/warn  */
+  --warn-light:#fefce8;      /* Amber-50                    */
 
-  --danger:#c93a3a;          /* Rose – overdue/urgent       */
-  --danger-light:#fdf0f0;
+  --danger:#e11d48;          /* Rose-600    – overdue/urgent*/
+  --danger-light:#fff1f2;    /* Rose-50                     */
 
-  --success:#1a7a6e;         /* Teal – paid                 */
+  --success:#0f766e;         /* Teal-700    – paid (neutral)*/
 
-  --text:#0f172a;
-  --text2:#2d3f58;
-  --muted:#5a6e85;
-  --muted-light:#8a9fb8;
+  --text:#0f172a;            /* Slate-900                   */
+  --text2:#334155;           /* Slate-700                   */
+  --muted:#64748b;           /* Slate-500                   */
+  --muted-light:#94a3b8;     /* Slate-400                   */
 
   --sidebar-w:224px;
   --shadow-sm:0 1px 3px rgba(15,23,42,.05),0 1px 2px rgba(15,23,42,.04);
@@ -43,7 +43,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 /* ── SIDEBAR ── */
 .sidebar{position:fixed;top:0;left:0;width:var(--sidebar-w);height:100vh;background:#1c2b3a;display:flex;flex-direction:column;z-index:100;padding:0 0 20px;box-shadow:4px 0 24px rgba(0,0,0,.12)}
 .logo{padding:22px 18px 18px;border-bottom:1px solid rgba(255,255,255,.07)}
-.logo-avatar{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#5b7fd4,#3b5bdb);display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;margin-bottom:12px;box-shadow:0 4px 12px rgba(91,127,212,.35)}
+.logo-avatar{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#5b7fd4,#5b7fd4);display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;margin-bottom:12px;box-shadow:0 4px 12px rgba(91,127,212,.35)}
 .logo-title{font-size:14px;font-weight:700;color:#f8fafc;letter-spacing:-.2px}
 .logo-sub{font-size:10.5px;color:rgba(255,255,255,.35);margin-top:3px;letter-spacing:.2px}
 nav{flex:1;padding:14px 10px;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
@@ -98,7 +98,7 @@ thead th{padding:9px 13px;text-align:left;font-size:10px;font-weight:700;text-tr
 thead th.th-amt{text-align:right}
 tbody tr{border-bottom:1px solid var(--border-light);transition:background .1s}
 tbody tr:last-child{border-bottom:none}
-tbody tr:hover{background:#f8f9ff}
+tbody tr:hover{background:#f8fbff}
 tbody td{padding:10px 13px;font-size:12px;vertical-align:middle;color:var(--text2)}
 tbody td.amt{text-align:right;font-variant-numeric:tabular-nums;font-weight:600;font-size:12px}
 tbody td.center{text-align:center}
@@ -156,16 +156,16 @@ tr.total-row td.total-amt.amt-pending{color:var(--accent)}
 /* ── RESET & BASE ── */
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;overflow-x:hidden}
-.sidebar{position:fixed;top:0;left:0;width:var(--sidebar-w);height:100vh;background:#0f172a;display:flex;flex-direction:column;z-index:100;padding:0 0 20px;box-shadow:4px 0 20px rgba(0,0,0,.15)}
+.sidebar{position:fixed;top:0;left:0;width:var(--sidebar-w);height:100vh;background:#1c2b3a;display:flex;flex-direction:column;z-index:100;padding:0 0 20px;box-shadow:4px 0 20px rgba(0,0,0,.15)}
 .logo{padding:22px 18px 18px;border-bottom:1px solid rgba(255,255,255,.07)}
-.logo-avatar{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#5b7fd4,#3b5bdb);display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;margin-bottom:12px;box-shadow:0 4px 12px rgba(59,130,246,.4)}
+.logo-avatar{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#5b7fd4,#3b5bdb);display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;margin-bottom:12px;box-shadow:0 4px 12px rgba(91,127,212,.4)}
 .logo-title{font-size:14px;font-weight:700;color:#f8fafc;letter-spacing:-.2px}
 .logo-sub{font-size:10.5px;color:rgba(255,255,255,.38);margin-top:3px;letter-spacing:.2px}
 nav{flex:1;padding:14px 10px;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
 .nav-section{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,.28);padding:12px 8px 5px}
 .nav-item{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;color:rgba(255,255,255,.55);transition:all .15s;border:1px solid transparent}
 .nav-item:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.9)}
-.nav-item.active{background:rgba(59,130,246,.18);color:#a8bfe8;font-weight:600;border-color:rgba(59,130,246,.25)}
+.nav-item.active{background:rgba(91,127,212,.18);color:#a8bfe8;font-weight:600;border-color:rgba(91,127,212,.25)}
 .nav-icon{font-size:14px;width:18px;text-align:center;opacity:.9}
 .sidebar-footer{padding:12px 18px;border-top:1px solid rgba(255,255,255,.07);font-size:10.5px;color:rgba(255,255,255,.32);letter-spacing:.1px}
 
@@ -223,7 +223,7 @@ tbody td.wrap{white-space:normal;min-width:160px;max-width:220px}
 
 /* ── TOTAL ROW — HIGHLIGHTED ── */
 tr.total-row td{
-  background:linear-gradient(90deg,#eaf0fb 0%,#f0f9ff 100%);
+  background:linear-gradient(90deg,#eaf0fb 0%,#f0f7ff 100%);
   border-top:2px solid var(--accent-mid) !important;
   border-bottom:2px solid var(--accent-mid) !important;
 }
