@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OOV Finance – Payment Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  /* ── 5-colour palette: Slate · Indigo · Amber · Rose · White ── */
+  --bg:#f1f5f9;
+  --surface:#ffffff;
+  --surface2:#f8fafc;
+  --surface3:#f1f5f9;
+  --border:#e2e8f0;
+  --border-light:#f1f5f9;
+
+  --accent:#4f46e5;          /* Indigo-600  – primary action */
+  --accent-light:#eef2ff;    /* Indigo-50   – subtle bg     */
+  --accent-mid:#c7d2fe;      /* Indigo-200  – border tint   */
+
+  --warn:#ca8a04;            /* Amber-600   – planned/warn  */
+  --warn-light:#fefce8;      /* Amber-50                    */
+
+  --danger:#e11d48;          /* Rose-600    – overdue/urgent*/
+  --danger-light:#fff1f2;    /* Rose-50                     */
+
+  --success:#0f766e;         /* Teal-700    – paid (neutral)*/
+
+  --text:#0f172a;            /* Slate-900                   */
+  --text2:#334155;           /* Slate-700                   */
+  --muted:#64748b;           /* Slate-500                   */
+  --muted-light:#94a3b8;     /* Slate-400                   */
+
+  --sidebar-w:224px;
+  --shadow-sm:0 1px 3px rgba(15,23,42,.05),0 1px 2px rgba(15,23,42,.04);
+  --shadow:0 4px 12px rgba(15,23,42,.07),0 2px 4px rgba(15,23,42,.04);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;overflow-x:hidden}
+
+/* ── SIDEBAR ── */
+.sidebar{position:fixed;top:0;left:0;width:var(--sidebar-w);height:100vh;background:#1e293b;display:flex;flex-direction:column;z-index:100;padding:0 0 20px;box-shadow:4px 0 24px rgba(0,0,0,.12)}
+.logo{padding:22px 18px 18px;border-bottom:1px solid rgba(255,255,255,.07)}
+.logo-avatar{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#4f46e5);display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;margin-bottom:12px;box-shadow:0 4px 12px rgba(99,102,241,.35)}
+.logo-title{font-size:14px;font-weight:700;color:#f8fafc;letter-spacing:-.2px}
+.logo-sub{font-size:10.5px;color:rgba(255,255,255,.35);margin-top:3px;letter-spacing:.2px}
+nav{flex:1;padding:14px 10px;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
+.nav-section{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,.25);padding:12px 8px 5px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;color:rgba(255,255,255,.52);transition:all .15s;border:1px solid transparent}
+.nav-item:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.88)}
+.nav-item.active{background:rgba(99,102,241,.2);color:#a5b4fc;font-weight:600;border-color:rgba(99,102,241,.3)}
+.nav-icon{font-size:14px;width:18px;text-align:center;opacity:.85}
+.sidebar-footer{padding:12px 18px;border-top:1px solid rgba(255,255,255,.07);font-size:10.5px;color:rgba(255,255,255,.3);letter-spacing:.1px}
+
+/* ── PULSE DOT ── */
+.update-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#34d399;margin-right:6px;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── MAIN LAYOUT ── */
+.main{margin-left:var(--sidebar-w);padding:28px 32px;min-height:100vh}
+.page{display:none}.page.active{display:block;animation:fadeUp .22s ease}
+.page-header{margin-bottom:24px;display:flex;align-items:flex-end;justify-content:space-between}
+.page-eyebrow{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.4px;color:var(--accent);margin-bottom:5px;opacity:.8}
+.page-title{font-size:23px;font-weight:800;color:var(--text);letter-spacing:-.5px}
+.page-subtitle{font-size:12px;color:var(--muted);margin-top:4px}
+.header-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:var(--surface);border:1px solid var(--border);border-radius:20px;font-size:11px;color:var(--muted);box-shadow:var(--shadow-sm)}
+
+/* ── FILTER BAR ── */
+.filter-bar{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;box-shadow:var(--shadow-sm)}
+.filter-bar-label{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted-light);margin-right:4px}
+.filter-select{padding:6px 10px;border-radius:7px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-family:'Inter',sans-serif;font-size:12px;font-weight:500;cursor:pointer;outline:none;min-width:110px;transition:border-color .15s}
+.filter-select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,70,229,.1)}
+.filter-refresh-btn{margin-left:auto;padding:7px 16px;border-radius:7px;border:1px solid var(--accent-mid);background:var(--accent-light);color:var(--accent);font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px}
+.filter-refresh-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 2px 8px rgba(79,70,229,.25)}
+.filter-refresh-btn:disabled{opacity:.45;cursor:not-allowed}
+
+/* ── CHARTS ── */
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 22px;box-shadow:var(--shadow-sm)}
+.chart-title{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.1px;color:var(--muted);margin-bottom:16px}
+
+/* ── TABLE CARD ── */
+.table-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:22px;box-shadow:var(--shadow-sm)}
+.table-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);background:var(--surface2)}
+.table-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.9px;color:var(--text2)}
+.filter-btn{padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-family:'Inter',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s}
+.filter-btn:hover,.filter-btn.active{border-color:var(--accent);color:var(--accent);background:var(--accent-light);font-weight:600}
+.search-input{padding:6px 11px;border-radius:7px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:'Inter',sans-serif;font-size:12px;width:180px;outline:none;transition:border-color .15s}
+.search-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,70,229,.1)}
+
+/* ── TABLE ── */
+table{width:100%;border-collapse:collapse;table-layout:auto}
+thead th{padding:9px 13px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);background:var(--surface3);border-bottom:1px solid var(--border);white-space:nowrap}
+thead th.th-amt{text-align:right}
+tbody tr{border-bottom:1px solid var(--border-light);transition:background .1s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:#f8f9ff}
+tbody td{padding:10px 13px;font-size:12px;vertical-align:middle;color:var(--text2)}
+tbody td.amt{text-align:right;font-variant-numeric:tabular-nums;font-weight:600;font-size:12px}
+tbody td.center{text-align:center}
+thead th{white-space:nowrap}
+tbody td{white-space:nowrap}
+tbody td.wrap{white-space:normal;min-width:160px;max-width:220px}
+
+/* ── TOTAL ROW — HIGHLIGHTED ── */
+tr.total-row td{
+  background:linear-gradient(90deg,#eef2ff 0%,#f5f3ff 100%);
+  border-top:2px solid var(--accent-mid) !important;
+  border-bottom:2px solid var(--accent-mid) !important;
+}
+tr.total-row td.total-label{
+  font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--accent);padding-left:16px
+}
+tr.total-row td.total-amt{
+  font-size:14px;font-weight:800;text-align:right;padding-right:16px;letter-spacing:-.3px
+}
+tr.total-row td.total-amt.amt-total{color:var(--text)}
+tr.total-row td.total-amt.amt-paid{color:var(--danger)}
+tr.total-row td.total-amt.amt-pending{color:var(--accent)}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.2px}
+.badge-paid{background:#ccfbf1;color:#0f766e}
+.badge-pending{background:var(--accent-light);color:#3730a3}
+.badge-overdue{background:var(--danger-light);color:#9f1239}
+.badge-blocked{background:#f1f5f9;color:#475569}
+.badge-duesoon{background:var(--warn-light);color:#92400e}
+
+/* ── AGING ── */
+.aging-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:22px}
+.aging-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;text-align:center;box-shadow:var(--shadow-sm);transition:transform .15s,box-shadow .15s}
+.aging-card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.aging-label{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.9px}
+.aging-val{font-size:19px;font-weight:800;margin:10px 0 4px;letter-spacing:-.3px}
+.aging-count{font-size:11px;color:var(--muted)}
+
+/* ── TABLE CELL TYPES ── */
+.tbl-supplier{min-width:150px;white-space:normal!important;font-weight:600;font-size:12px;color:var(--text)}
+.tbl-inv{font-family:monospace;font-size:11px;color:var(--muted)}
+.tbl-date{font-size:11.5px;color:var(--text2);letter-spacing:.2px}
+.tbl-note{font-size:11px;color:var(--muted);white-space:normal;min-width:140px;max-width:200px}
+.tbl-aging{font-size:11.5px;font-weight:600}
+.tbl-month span{background:var(--accent-light);color:var(--accent);padding:2px 9px;border-radius:10px;font-size:11px;font-weight:600}
+
+/* ── LOADING ── */
+.loading{display:flex;align-items:center;justify-content:center;height:200px;color:var(--muted);font-size:13px;gap:10px}
+.spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* ── RESET & BASE ── */
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;overflow-x:hidden}
+.sidebar{position:fixed;top:0;left:0;width:var(--sidebar-w);height:100vh;background:#0f172a;display:flex;flex-direction:column;z-index:100;padding:0 0 20px;box-shadow:4px 0 20px rgba(0,0,0,.15)}
+.logo{padding:22px 18px 18px;border-bottom:1px solid rgba(255,255,255,.07)}
+.logo-avatar{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#3730a3);display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;margin-bottom:12px;box-shadow:0 4px 12px rgba(59,130,246,.4)}
+.logo-title{font-size:14px;font-weight:700;color:#f8fafc;letter-spacing:-.2px}
+.logo-sub{font-size:10.5px;color:rgba(255,255,255,.38);margin-top:3px;letter-spacing:.2px}
+nav{flex:1;padding:14px 10px;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
+.nav-section{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,.28);padding:12px 8px 5px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;color:rgba(255,255,255,.55);transition:all .15s;border:1px solid transparent}
+.nav-item:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.9)}
+.nav-item.active{background:rgba(59,130,246,.18);color:#a5b4fc;font-weight:600;border-color:rgba(59,130,246,.25)}
+.nav-icon{font-size:14px;width:18px;text-align:center;opacity:.9}
+.sidebar-footer{padding:12px 18px;border-top:1px solid rgba(255,255,255,.07);font-size:10.5px;color:rgba(255,255,255,.32);letter-spacing:.1px}
+
+/* ── PULSE DOT ── */
+.update-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#34d399;margin-right:6px;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── MAIN LAYOUT ── */
+.main{margin-left:var(--sidebar-w);padding:28px 32px;min-height:100vh}
+.page{display:none}.page.active{display:block;animation:fadeUp .22s ease}
+.page-header{margin-bottom:24px;display:flex;align-items:flex-end;justify-content:space-between}
+.page-eyebrow{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.4px;color:var(--accent);margin-bottom:5px;opacity:.85}
+.page-title{font-size:23px;font-weight:800;color:var(--text);letter-spacing:-.5px}
+.page-subtitle{font-size:12px;color:var(--muted);margin-top:4px}
+.header-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:var(--surface);border:1px solid var(--border);border-radius:20px;font-size:11px;color:var(--muted);box-shadow:var(--shadow-sm)}
+
+/* ── FILTER BAR ── */
+.filter-bar{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;box-shadow:var(--shadow-sm)}
+.filter-bar-label{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted-light);margin-right:4px}
+.filter-select{padding:6px 10px;border-radius:7px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-family:'Inter',sans-serif;font-size:12px;font-weight:500;cursor:pointer;outline:none;min-width:110px;transition:border-color .15s}
+.filter-select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.filter-refresh-btn{margin-left:auto;padding:7px 16px;border-radius:7px;border:1px solid var(--accent-mid);background:var(--accent-light);color:var(--accent);font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px}
+.filter-refresh-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 2px 8px rgba(37,99,235,.3)}
+.filter-refresh-btn:disabled{opacity:.45;cursor:not-allowed}
+
+/* ── CHARTS ── */
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 22px;box-shadow:var(--shadow-sm)}
+.chart-title{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.1px;color:var(--muted);margin-bottom:16px}
+
+/* ── TABLE CARD ── */
+.table-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:22px;box-shadow:var(--shadow-sm)}
+.table-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);background:var(--surface2)}
+.table-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.9px;color:var(--text2)}
+.filter-btn{padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-family:'Inter',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s}
+.filter-btn:hover,.filter-btn.active{border-color:var(--accent);color:var(--accent);background:var(--accent-light);font-weight:600}
+.search-input{padding:6px 11px;border-radius:7px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:'Inter',sans-serif;font-size:12px;width:180px;outline:none;transition:border-color .15s}
+.search-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+
+/* ── TABLE ── */
+table{width:100%;border-collapse:collapse;table-layout:auto}
+thead th{padding:9px 13px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);background:var(--surface3);border-bottom:1px solid var(--border);white-space:nowrap}
+thead th.th-amt{text-align:right}
+tbody tr{border-bottom:1px solid var(--border-light);transition:background .1s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:#f8fbff}
+tbody td{padding:10px 13px;font-size:12px;vertical-align:middle;color:var(--text2)}
+tbody td.amt{text-align:right;font-variant-numeric:tabular-nums;font-weight:600;font-size:12px}
+tbody td.center{text-align:center}
+thead th{white-space:nowrap}
+tbody td{white-space:nowrap}
+tbody td.wrap{white-space:normal;min-width:160px;max-width:220px}
+
+/* ── TOTAL ROW — HIGHLIGHTED ── */
+tr.total-row td{
+  background:linear-gradient(90deg,#eef2ff 0%,#f0f9ff 100%);
+  border-top:2px solid var(--accent-mid) !important;
+  border-bottom:2px solid var(--accent-mid) !important;
+}
+tr.total-row td.total-label{
+  font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--accent);padding-left:16px
+}
+tr.total-row td.total-amt{
+  font-size:14px;font-weight:800;text-align:right;padding-right:16px;letter-spacing:-.3px
+}
+tr.total-row td.total-amt.amt-total{color:var(--text)}
+tr.total-row td.total-amt.amt-paid{color:#e11d48}
+tr.total-row td.total-amt.amt-pending{color:var(--accent)}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.2px}
+.badge-paid{background:#d1fae5;color:#065f46}
+.badge-pending{background:#eef2ff;color:#3730a3}
+.badge-overdue{background:#fff1f2;color:#9f1239}
+.badge-blocked{background:#e2e8f0;color:#475569}
+.badge-duesoon{background:#fef3c7;color:#92400e}
+
+/* ── AGING ── */
+.aging-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:22px}
+.aging-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;text-align:center;box-shadow:var(--shadow-sm);transition:transform .15s,box-shadow .15s}
+.aging-card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.aging-label{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.9px}
+.aging-val{font-size:19px;font-weight:800;margin:10px 0 4px;letter-spacing:-.3px}
+.aging-count{font-size:11px;color:var(--muted)}
+
+/* ── TABLE CELL TYPES ── */
+.tbl-supplier{min-width:150px;white-space:normal!important;font-weight:600;font-size:12px;color:var(--text)}
+.tbl-inv{font-family:monospace;font-size:11px;color:var(--muted)}
+.tbl-date{font-size:11.5px;color:var(--text2);letter-spacing:.2px}
+.tbl-note{font-size:11px;color:var(--muted);white-space:normal;min-width:140px;max-width:200px}
+.tbl-aging{font-size:11.5px;font-weight:600}
+.tbl-month span{background:var(--accent-light);color:var(--accent);padding:2px 9px;border-radius:10px;font-size:11px;font-weight:600}
+
+/* ── LOADING ── */
+.loading{display:flex;align-items:center;justify-content:center;height:200px;color:var(--muted);font-size:13px;gap:10px}
+.spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-avatar">OOV</div>
+    <div class="logo-title">OOV Finance</div>
+    <div class="logo-sub">Payment Dashboard v3.0</div>
+  </div>
+  <nav>
+    <div class="nav-item active" onclick="showPage('overview',this)"><span class="nav-icon">📊</span> Overview</div>
+    <div class="nav-item" onclick="showPage('monthly',this)"><span class="nav-icon">📆</span> Monthly Payment</div>
+    <div class="nav-item" onclick="showPage('supplier-info',this)"><span class="nav-icon">🏢</span> Supplier Info</div>
+    <div class="nav-item" onclick="showPage('detail',this)"><span class="nav-icon">📋</span> Invoice List</div>
+    <div class="nav-item" onclick="showPage('aging',this)"><span class="nav-icon">⏱️</span> Aging</div>
+  </nav>
+  <div class="sidebar-footer"><span class="update-dot"></span>Last sync: <span id="lastSync">—</span></div>
+</aside>
+
+<main class="main">
+
+<!-- OVERVIEW -->
+<div class="page active" id="page-overview">
+  <div class="page-header">
+    <div>
+      <div class="page-eyebrow">Executive Summary · 2026</div>
+      <div class="page-title">Payment Overview</div>
+      <div class="page-subtitle" id="ov-subtitle">Loading...</div>
+    </div>
+    <div class="header-badge"><span class="update-dot"></span>Live · <span id="liveSyncBadge">—</span></div>
+  </div>
+  <div class="filter-bar">
+    <span class="filter-bar-label">Filters</span>
+    <select class="filter-select" id="ov-status" onchange="applyOvFilter()">
+      <option value="">All Status</option>
+      <option>Paid</option><option>Pending</option><option>Overdue</option><option>Due Soon</option><option>Blocked</option>
+    </select>
+    <select class="filter-select" id="ov-month" onchange="applyOvFilter()">
+      <option value="">All Months</option>
+      <option value="Jan">January</option><option value="Feb">February</option><option value="Mar">March</option>
+      <option value="Apr">April</option><option value="May">May</option><option value="Jun">June</option>
+      <option value="Jul">July</option><option value="Aug">August</option><option value="Sep">September</option>
+      <option value="Oct">October</option><option value="Nov">November</option><option value="Dec">December</option>
+    </select>
+    <button class="filter-refresh-btn" id="refreshBtn" onclick="loadData()">&#8634; Refresh data</button>
+  </div>
+  <div style="margin-bottom:8px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted)">Key Indicators</div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px" id="execKpiGrid">
+    <div class="loading"><div class="spinner"></div> Loading...</div>
+  </div>
+  <div style="margin-bottom:8px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted)">Risk Analysis & Trends</div>
+  <div class="charts-row">
+    <div class="chart-card">
+      <div class="chart-title">Cash Flow Distribution by Priority</div>
+      <div id="priorityLegend" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;font-size:11px"></div>
+      <div style="position:relative;height:220px"><canvas id="priorityDonut"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Monthly Debt Trend — Invoiced vs Paid vs Outstanding</div>
+      <div style="position:relative;height:240px"><canvas id="trendChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Overdue Risk Banner -->
+  <div id="overdueRiskBanner" style="margin-bottom:18px"></div>
+
+  <!-- Action Required Table -->
+  <div class="table-card">
+    <div class="table-header">
+      <span class="table-title">⚠️ Action Required — Pending Invoices</span>
+      <span id="actionCount" style="font-size:11px;color:var(--muted);margin-left:8px"></span>
+    </div>
+    <table>
+      <thead><tr>
+        <th>Supplier</th><th>Invoice</th><th>Due Date</th>
+        <th class="th-amt">Pending (USD)</th><th>Status</th><th>Priority</th><th>Aging</th><th>Notes</th>
+      </tr></thead>
+      <tbody id="urgentTableBody"></tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- MONTHLY PAYABLES -->
+<div class="page" id="page-monthly">
+  <div class="page-header">
+    <div>
+      <div class="page-eyebrow">Financial Data · 2026</div>
+      <div class="page-title">Monthly Payment</div>
+      <div class="page-subtitle" id="monthly-subtitle">Invoices due this month</div>
+    </div>
+  </div>
+  <div class="filter-bar">
+    <span class="filter-bar-label">CF Month</span>
+    <select class="filter-select" id="mp-month" onchange="applyMonthlyFilter()">
+      <option value="">All Months</option>
+      <option>Jan</option><option>Feb</option><option>Mar</option><option>Apr</option>
+      <option>May</option><option>Jun</option><option>Jul</option><option>Aug</option>
+      <option>Sep</option><option>Oct</option><option>Nov</option><option>Dec</option>
+    </select>
+    <select class="filter-select" id="mp-priority" onchange="applyMonthlyFilter()">
+      <option value="">All Priority</option>
+      <option>🔴 Urgent</option><option>🟠 Planned</option><option>🟢 Consider</option><option>⚫ Blocked</option>
+    </select>
+    <select class="filter-select" id="mp-status" onchange="applyMonthlyFilter()">
+      <option value="">All Status</option>
+      <option>Overdue</option><option>Due Soon</option><option>Pending</option><option>Paid</option><option>Blocked</option>
+    </select>
+    <select class="filter-select" id="mp-supplier" onchange="applyMonthlyFilter()" style="min-width:180px">
+      <option value="">All Suppliers</option>
+    </select>
+    <input class="search-input" placeholder="🔍 Search..." oninput="applyMonthlyFilter()" id="mp-search" style="width:150px">
+    <button class="filter-refresh-btn" onclick="loadData()">&#8634; Refresh data</button>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px" id="monthlyKpiRow"></div>
+  <div class="table-card">
+    <div class="table-header">
+      <span class="table-title">⚠️ Invoices Requiring Action</span>
+      <span id="monthly-count" style="font-size:11px;color:var(--muted);margin-left:8px"></span>
+    </div>
+    <table><thead><tr><th>#</th><th>Supplier</th><th>Invoice</th><th>Due Date</th><th class="th-amt">Inv Amount</th><th class="th-amt">Paid</th><th class="th-amt">Pending</th><th>Status</th><th>Priority</th><th>PMT Date</th><th>Notes</th></tr><tr id="monthlyTotalRow" class="total-row"></tr></thead>
+    <tbody id="monthlyTableBody"></tbody></table>
+  </div>
+</div>
+
+<div class="page" id="page-supplier-info">
+  <div class="page-header">
+    <div>
+      <div class="page-eyebrow">Financial Data · 2026</div>
+      <div class="page-title">Supplier Information</div>
+      <div class="page-subtitle">Bank account details by supplier</div>
+    </div>
+  </div>
+  <div class="filter-bar">
+    <span class="filter-bar-label">Supplier</span>
+    <select class="filter-select" id="supplierDropdown" onchange="filterSupplierInfo(this.value)" style="min-width:220px">
+      <option value="">All Suppliers</option>
+    </select>
+    <input class="search-input" placeholder="🔍 Search supplier..." oninput="searchSupplierInfo(this.value)" style="width:200px">
+    <button class="filter-refresh-btn" onclick="loadData()">&#8634; Refresh data</button>
+  </div>
+  <div class="table-card">
+    <div class="table-header"><span class="table-title">Supplier Bank Details</span></div>
+    <table><thead><tr><th>#</th><th>Supplier</th><th>Bank Name</th><th>Bank Account</th><th>Swift Code</th></tr></thead>
+    <tbody id="supplierInfoBody"></tbody></table>
+  </div>
+</div>
+
+<!-- AGING -->
+<div class="page" id="page-aging">
+  <div class="page-header">
+    <div>
+      <div class="page-eyebrow">Financial Data · 2026</div>
+      <div class="page-title">Aging Analysis</div>
+      <div class="page-subtitle">Debt classification by days overdue</div>
+    </div>
+  </div>
+  <div class="filter-bar">
+    <button class="filter-refresh-btn" onclick="loadData()">&#8634; Refresh data</button>
+  </div>
+  <div class="aging-grid" id="agingGrid"></div>
+  <div class="charts-row">
+    <div class="chart-card"><div class="chart-title">Aging Distribution (by Value)</div><div style="position:relative;height:280px"><canvas id="agingDonut"></canvas></div></div>
+    <div class="chart-card"><div class="chart-title">Aging by Supplier</div><div style="position:relative;height:280px"><canvas id="agingSupplier"></canvas></div></div>
+  </div>
+  <div class="table-card">
+    <div class="table-header"><span class="table-title">Aging Detail</span></div>
+    <table><thead><tr><th>Supplier</th><th>Invoice</th><th>Due Date</th><th>Days</th><th>Amount (USD)</th><th>Aging Bucket</th><th>Priority</th></tr></thead>
+    <tbody id="agingTableBody"></tbody></table>
+  </div>
+</div>
+
+<!-- INVOICE DETAIL -->
+<div class="page" id="page-detail">
+  <div class="page-header">
+    <div>
+      <div class="page-eyebrow">Financial Data · 2026</div>
+      <div class="page-title">Invoice List</div>
+      <div class="page-subtitle" id="detail-subtitle"></div>
+    </div>
+  </div>
+  <div class="filter-bar">
+    <select class="filter-select" id="detail-pmtdate" onchange="applyDetailFilters()">
+      <option value="">All PMT Month</option>
+    </select>
+    <select class="filter-select" id="detail-supplier" onchange="applyDetailFilters()">
+      <option value="">All Suppliers</option>
+    </select>
+    <select class="filter-select" id="detail-priority" onchange="applyDetailFilters()">
+      <option value="">All Priority</option>
+      <option>🔴 Urgent</option><option>🟠 Planned</option><option>🟢 Consider</option><option>⚫ Blocked</option><option>✅ Done</option>
+    </select>
+    <select class="filter-select" id="detail-status" onchange="applyDetailFilters()">
+      <option value="">All Status</option>
+      <option>Overdue</option><option>Due Soon</option><option>Pending</option><option>Paid</option><option>Blocked</option>
+    </select>
+    <button class="filter-refresh-btn" onclick="loadData()">&#8634; Refresh</button>
+  </div>
+  <div class="table-card">
+    <div class="table-header">
+      <span class="table-title">Full Invoice List</span>
+      <span id="detail-count" style="font-size:11px;color:var(--muted);margin-left:8px"></span>
+    </div>
+    <table><thead><tr><th>#</th><th>Supplier</th><th>Invoice</th><th>Inv. Date</th><th>Due Date</th><th class="th-amt">Total (USD)</th><th class="th-amt">Paid</th><th class="th-amt">Outstanding</th><th>Status</th><th>Priority</th><th>PMT Date</th><th>Notes</th></tr><tr id="detailTotalRow" class="total-row"></tr></thead>
+    <tbody id="mainTableBody"></tbody></table>
+  </div>
+</div>
+
+</main>
+
+<script>
+// ===== CONFIG =====
+var SHEET_ID = '18y56oiYAMH_3i9i30yAnP3FvhKjDnxeH3tsD57x7oHc';
+var GID = '807268203';
+var CSV_URL = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/export?format=csv&gid=' + GID;
+
+var allData = [];
+var chartFont = {family:"'Inter',sans-serif",size:11};
+var monthAbbr = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+var priorityOrder = {'🔴 Urgent':0,'🟠 Planned':1,'🟢 Consider':2,'⚫ Blocked':3,'✅ Done':4};
+
+// ===== HELPERS =====
+function fmt(n){return n===0?'$0':'$'+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function fmtK(n){return Math.abs(n)>=1000?'$'+(Math.abs(n)/1000).toFixed(1)+'K':fmt(n);}
+function badge(s){
+  var m={
+    'Paid':'<span class="badge badge-paid">✅ Paid</span>',
+    'Overdue':'<span class="badge badge-overdue">🔴 Overdue</span>',
+    'Due Soon':'<span class="badge badge-duesoon">⏰ Due Soon</span>',
+    'Pending':'<span class="badge badge-pending">⏳ Pending</span>',
+    'Blocked':'<span class="badge badge-blocked">⚫ Blocked</span>'
+  };
+  return m[s]||('<span class="badge badge-pending">'+s+'</span>');
+}
+function parseDateMs(s){
+  if(!s||s==='—') return null;
+  var months={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+  var p=s.split('-');
+  if(p.length===3){var d=parseInt(p[0]),m=months[p[1]],y=parseInt(p[2]);if(y<100)y+=2000;if(!isNaN(d)&&m!==undefined&&!isNaN(y))return new Date(y,m,d).getTime();}
+  var dt=new Date(s);return isNaN(dt.getTime())?null:dt.getTime();
+}
+function fmtDate(val){
+  if(!val) return '—';
+  try{
+    var dt=new Date(val);
+    if(isNaN(dt.getTime())) return String(val).trim();
+    return dt.getDate()+'-'+monthAbbr[dt.getMonth()]+'-'+String(dt.getFullYear()).slice(2);
+  }catch(e){return String(val);}
+}
+function autoStatus(dueDate,pending,inv){
+  if(!inv||inv==='—') return 'Blocked';
+  if(pending<=0) return 'Paid';
+  var ms=parseDateMs(dueDate);if(!ms) return 'Blocked';
+  var days=(ms-new Date().getTime())/86400000;
+  if(days<0) return 'Overdue';if(days<=7) return 'Due Soon';return 'Pending';
+}
+function autoPriority(status){
+  var m={'Paid':'✅ Done','Overdue':'🔴 Urgent','Due Soon':'🟠 Planned','Pending':'🟢 Consider','Blocked':'⚫ Blocked'};
+  return m[status]||'';
+}
+
+// ===== CSV PARSER =====
+function parseCSV(text){
+  var rows=[];
+  var lines=text.split(/\r?\n/);
+  for(var i=0;i<lines.length;i++){
+    var row=[];var cur='';var inQ=false;var line=lines[i];
+    for(var j=0;j<line.length;j++){
+      var ch=line[j];
+      if(ch==='"'){
+        if(inQ&&line[j+1]==='"'){cur+='"';j++;}
+        else{inQ=!inQ;}
+      } else if(ch===','&&!inQ){
+        row.push(cur.trim());cur='';
+      } else{cur+=ch;}
+    }
+    row.push(cur.trim());
+    rows.push(row);
+  }
+  return rows;
+}
+
+// ===== LOAD DATA FROM GOOGLE SHEETS =====
+function loadData(){
+  var btn=document.getElementById('refreshBtn');
+  if(btn){btn.textContent='⏳ Loading...';btn.disabled=true;}
+
+  // Cache-bust với timestamp
+  var url=CSV_URL+'&t='+new Date().getTime();
+
+  fetch(url)
+    .then(function(r){
+      if(!r.ok) throw new Error('Network error: '+r.status);
+      return r.text();
+    })
+    .then(function(text){
+      allData=parseSheetData(text);
+      var now=new Date();
+      var syncStr=now.getDate()+'-'+monthAbbr[now.getMonth()]+'-'+now.getFullYear()+' '+
+        String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+      document.getElementById('lastSync').textContent=syncStr;
+      document.getElementById('liveSyncBadge').textContent=syncStr;
+      if(btn){btn.textContent='↺ Refresh data';btn.disabled=false;}
+      renderCurrentPage();
+    })
+    .catch(function(err){
+      console.error('Error loading data:',err);
+      if(btn){btn.textContent='↺ Refresh data';btn.disabled=false;}
+      alert('Error loading data: '+err.message);
+    });
+}
+
+function parseSheetData(csvText){
+  var rows=parseCSV(csvText);
+  // Header ở hàng 4 (index 3), data từ hàng 5 (index 4)
+  var data=[];
+  for(var i=4;i<rows.length;i++){
+    var r=rows[i];
+    if(!r||r.length<5) continue;
+    var supplier=String(r[3]||'').trim();
+    if(!supplier) continue;
+
+    var bankAcc=String(r[4]||'').trim();   // E
+    var bank=String(r[5]||'').trim();      // F
+    var swift=String(r[6]||'').trim();     // G
+    var desc=String(r[7]||'').trim();      // H
+    var inv=String(r[8]||'—').trim()||'—'; // I
+    var invDate=fmtDate(r[9]);             // J
+    var dueDate=fmtDate(r[10]);            // K
+    // Hàm parse số kế toán: xử lý $(1,294.79), -$1,294.79, $1,294.79
+    function parseAcct(s){
+      s=String(s||'').replace(/[$,\s]/g,'');
+      if(s.indexOf('(')>=0) s='-'+s.replace(/[()]/g,'');
+      return Math.abs(parseFloat(s)||0);
+    }
+    var amount=parseAcct(r[13]); // N
+    var paid=parseAcct(r[14]);   // O
+    var pending=parseAcct(r[15]);// P
+    if(isNaN(pending)||pending===0) pending=Math.max(0,amount-paid);
+    var statusPmt=String(r[16]||'').trim(); // Q
+    // R = blank (index 17)
+    // S = CF Month (index 18)
+    var monthDebt=String(r[18]||'').trim(); // S
+    // Parse các dạng: M/D/YYYY, Jun-2026, Jun-26, Jun
+    if(monthDebt){
+      if(monthDebt.indexOf('/')>-1){
+        // Dạng M/D/YYYY
+        var parts=monthDebt.split('/');
+        if(parts.length>=2){var mIdx=parseInt(parts[0])-1;if(mIdx>=0&&mIdx<12) monthDebt=monthAbbr[mIdx];}
+      } else if(monthDebt.indexOf('-')>-1){
+        // Dạng Jun-2026 hoặc Jun-26
+        var mPart=monthDebt.split('-')[0];
+        // Lấy 3 ký tự đầu để match với monthAbbr
+        mPart=mPart.slice(0,3);
+        mPart=mPart.charAt(0).toUpperCase()+mPart.slice(1).toLowerCase();
+        if(monthAbbr.indexOf(mPart)>=0) monthDebt=mPart;
+      }
+    }
+    var pmtDate=fmtDate(r[19]);            // T
+    var status=String(r[20]||'').trim();   // U
+    var overDue=String(r[21]||'').trim();  // V
+    var priority=String(r[22]||'').trim(); // W
+    var note=String(r[23]||'').trim();     // X
+
+    // Chuẩn hóa status
+    var statusMap={'due soon':'Due Soon','overdue':'Overdue','pending':'Pending','paid':'Paid','blocked':'Blocked','partial paid':'Pending'};
+    if(status) status=statusMap[status.toLowerCase()]||status;
+    if(!status||status.toLowerCase()==='auto') status=autoStatus(dueDate,pending,inv);
+    if(!priority) priority=autoPriority(status);
+
+    data.push({
+      supplier:supplier,bank:bank||bankAcc,bankAcc:bankAcc,swift:swift,
+      inv:inv,desc:desc,invDate:invDate,dueDate:dueDate,
+      amount:amount,paid:paid,pending:pending,
+      statusPmt:statusPmt,pmtDate:pmtDate,status:status,
+      overDue:overDue,priority:priority,note:note,monthDebt:monthDebt
+    });
+  }
+  return data;
+}
+
+// ===== NAVIGATION =====
+var currentPage='overview';
+function showPage(id,el){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active');});
+  document.getElementById('page-'+id).classList.add('active');
+  if(el) el.classList.add('active');
+  currentPage=id;
+  renderCurrentPage();
+}
+
+function renderCurrentPage(){
+  if(currentPage==='overview') renderOverview(getFilteredOvData());
+  else if(currentPage==='monthly') applyMonthlyFilter();
+  else if(currentPage==='supplier-info') renderSupplierInfo();
+  else if(currentPage==='aging') renderAging();
+  else if(currentPage==='detail') applyDetailFilters();
+}
+
+// ===== OVERVIEW =====
+var priorityDonutInst=null,trendChartInst=null;
+
+function getFilteredOvData(){
+  var status=document.getElementById('ov-status').value;
+  var month=document.getElementById('ov-month').value;
+  return allData.filter(function(d){
+    if(status&&d.status!==status) return false;
+    if(month&&d.monthDebt!==month) return false;
+    return true;
+  });
+}
+function applyOvFilter(){renderOverview(getFilteredOvData());}
+
+function renderOverview(data){
+  var now=new Date();
+  var curMonth=now.getMonth(),curYear=now.getFullYear();
+  var totalAP=0,urgentAmt=0,plannedAmt=0,considerAmt=0,blockedAmt=0,overdueAmt=0,overdue45=0;
+  data.filter(function(d){return d.status!=='Paid';}).forEach(function(d){
+    totalAP+=d.pending;
+    if(d.priority.indexOf('Urgent')>=0) urgentAmt+=d.pending;
+    else if(d.priority.indexOf('Planned')>=0) plannedAmt+=d.pending;
+    else if(d.priority.indexOf('Consider')>=0) considerAmt+=d.pending;
+    else if(d.priority.indexOf('Blocked')>=0) blockedAmt+=d.pending;
+    if(d.status==='Overdue'){
+      overdueAmt+=d.pending;
+      var dueMs=parseDateMs(d.dueDate);
+      if(dueMs&&(now.getTime()-dueMs)/86400000>45) overdue45+=d.pending;
+    }
+  });
+  var suppliers=[...new Set(data.map(function(d){return d.supplier;}))];
+  document.getElementById('ov-subtitle').textContent=data.length+' invoices · '+suppliers.length+' suppliers';
+
+  // KPI
+  var pendingCount=data.filter(function(d){return d.status!=='Paid';}).length;
+  var urgentCount=data.filter(function(d){return d.priority.indexOf('Urgent')>=0&&d.status!=='Paid';}).length;
+  var plannedCount=data.filter(function(d){return d.priority.indexOf('Planned')>=0&&d.status!=='Paid';}).length;
+  var considerCount=data.filter(function(d){return d.priority.indexOf('Consider')>=0&&d.status!=='Paid';}).length;
+  document.getElementById('execKpiGrid').innerHTML=[
+    {label:'Total AP Outstanding',icon:'💰',border:'#4f46e5',bg:'linear-gradient(135deg,#4f46e5,#3730a3)',value:fmtK(totalAP),pct:null,meta:pendingCount+' invoices · '+suppliers.length+' suppliers',color:'#fff',heroCard:true},
+    {label:'Urgent — Action Required',icon:'🚨',border:'#e11d48',bg:'#fff',value:fmtK(urgentAmt),pct:totalAP>0?(urgentAmt/totalAP*100).toFixed(1)+'%':null,meta:urgentCount+' invoices',color:'#e11d48',heroCard:false},
+    {label:'Planned — Due Soon',icon:'📋',border:'#ca8a04',bg:'#fff',value:fmtK(plannedAmt),pct:totalAP>0?(plannedAmt/totalAP*100).toFixed(1)+'%':null,meta:plannedCount+' invoices',color:'#ca8a04',heroCard:false},
+    {label:'Consider — Under Review',icon:'💡',border:'#0f766e',bg:'#fff',value:fmtK(considerAmt),pct:totalAP>0?(considerAmt/totalAP*100).toFixed(1)+'%':null,meta:considerCount+' invoices',color:'#0f766e',heroCard:false}
+  ].map(function(k){
+    if(k.heroCard){
+      return '<div style="background:'+k.bg+';border-radius:14px;padding:22px 24px;position:relative;overflow:hidden;box-shadow:0 8px 24px rgba(37,99,235,.3)">'+
+        '<div style="position:absolute;right:-10px;top:-10px;font-size:64px;opacity:.12">'+k.icon+'</div>'+
+        '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,.65);margin-bottom:12px">'+k.label+'</div>'+
+        '<div style="font-size:34px;font-weight:800;letter-spacing:-.8px;color:#fff;margin-bottom:6px">'+k.value+'</div>'+
+        '<div style="font-size:11px;color:rgba(255,255,255,.6)">'+k.meta+'</div>'+
+        '<div style="position:absolute;bottom:-20px;left:-20px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.07)"></div>'+
+      '</div>';
+    }
+    return '<div style="background:#fff;border:1px solid var(--border);border-left:4px solid '+k.border+';border-radius:12px;padding:20px 22px;position:relative;overflow:hidden;box-shadow:var(--shadow-sm)">'+
+      '<div style="position:absolute;right:14px;top:14px;font-size:22px;opacity:.1">'+k.icon+'</div>'+
+      '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:10px">'+k.icon+' '+k.label+'</div>'+
+      '<div style="display:flex;align-items:baseline;gap:10px;margin-bottom:6px">'+
+        '<div style="font-size:28px;font-weight:800;letter-spacing:-.6px;color:'+k.color+'">'+k.value+'</div>'+
+        (k.pct?'<div style="font-size:12px;font-weight:700;color:'+k.color+';opacity:.75;background:rgba(0,0,0,.05);padding:2px 8px;border-radius:20px">'+k.pct+'</div>':'')+
+      '</div>'+
+      '<div style="font-size:11px;color:var(--muted)">'+k.meta+'</div></div>';
+  }).join('');
+
+  // Priority donut
+  var pColors=['#e11d48','#ca8a04','#0f766e','#64748b'];
+  var pLabels=['🔴 Urgent','🟠 Planned','🟢 Consider','⚫ Blocked'];
+  var pVals=[urgentAmt,plannedAmt,considerAmt,blockedAmt];
+  var pTotal=pVals.reduce(function(a,b){return a+b;},0);
+  document.getElementById('priorityLegend').innerHTML=pLabels.map(function(l,i){
+    var pct=pTotal>0?(pVals[i]/pTotal*100).toFixed(1):'0.0';
+    return '<span style="display:inline-flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:50%;background:'+pColors[i]+';display:inline-block"></span><span style="color:var(--muted)">'+l+' <strong>'+pct+'%</strong></span></span>';
+  }).join('');
+  if(priorityDonutInst) priorityDonutInst.destroy();
+  priorityDonutInst=new Chart(document.getElementById('priorityDonut'),{
+    type:'doughnut',
+    data:{labels:pLabels,datasets:[{data:pVals,backgroundColor:pColors,borderWidth:2,borderColor:'#fff',hoverOffset:6}]},
+    options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:25,bottom:25,left:55,right:55}},
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){var v=ctx.raw||0;return ' '+fmtK(v)+' ('+(pTotal>0?(v/pTotal*100).toFixed(1):0)+'%)';}}}}
+      ,cutout:'62%'},
+    plugins:[{id:'pc',afterDraw:function(chart){
+      var c=chart.ctx,cx=chart.chartArea.left+(chart.chartArea.right-chart.chartArea.left)/2,cy=chart.chartArea.top+(chart.chartArea.bottom-chart.chartArea.top)/2;
+      c.save();c.textAlign='center';c.textBaseline='middle';
+      c.font='700 13px Inter,sans-serif';c.fillStyle='#0d1b2e';c.fillText(fmtK(pTotal),cx,cy-8);
+      c.font='400 10px Inter,sans-serif';c.fillStyle='#5a6e85';c.fillText('Total AP',cx,cy+9);
+      var meta=chart.getDatasetMeta(0);
+      meta.data.forEach(function(arc,i){
+        var val=pVals[i];if(!val) return;
+        var pct=(val/pTotal*100).toFixed(1);
+        var lbl=pLabels[i].replace(/\p{Emoji}/gu,'')+' '+pct+'%';
+        var angle=arc.startAngle+(arc.endAngle-arc.startAngle)/2;
+        var r=arc.outerRadius;
+        var x1=cx+Math.cos(angle)*r,y1=cy+Math.sin(angle)*r;
+        var x3=cx+Math.cos(angle)*(r+24),y3=cy+Math.sin(angle)*(r+24);
+        var isR=Math.cos(angle)>=0;
+        c.save();c.strokeStyle=pColors[i];c.lineWidth=1.2;
+        c.beginPath();c.moveTo(x1,y1);c.lineTo(cx+Math.cos(angle)*(r+12),cy+Math.sin(angle)*(r+12));c.lineTo(x3,y3);c.stroke();
+        c.font='500 9.5px Inter,sans-serif';c.fillStyle='#0d1b2e';
+        c.textAlign=isR?'left':'right';c.textBaseline='middle';
+        c.fillText(lbl,isR?x3+4:x3-4,y3);c.restore();
+      });
+      c.restore();
+    }}]
+  });
+
+  // Trend chart
+  var mT={};
+  data.forEach(function(d){
+    if(!d.monthDebt) return;
+    var k=d.monthDebt;
+    if(!mT[k]) mT[k]={total:0,paid:0,pending:0,order:monthAbbr.indexOf(k)};
+    mT[k].total+=d.amount;mT[k].paid+=d.paid;mT[k].pending+=d.pending;
+  });
+  var tK=Object.keys(mT).sort(function(a,b){return mT[a].order-mT[b].order;});
+  if(trendChartInst) trendChartInst.destroy();
+  trendChartInst=new Chart(document.getElementById('trendChart'),{
+    type:'bar',
+    data:{labels:tK,datasets:[
+      {label:'Total Invoiced',data:tK.map(function(k){return mT[k].total;}),backgroundColor:'#c7d2fe',borderWidth:0,borderRadius:4,order:2},
+      {label:'Paid',data:tK.map(function(k){return mT[k].paid;}),backgroundColor:'#4f46e5',borderWidth:0,borderRadius:4,order:1}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{position:'top',align:'end',labels:{font:chartFont,usePointStyle:true,pointStyle:'circle',padding:14}}},
+      scales:{x:{ticks:{font:chartFont},grid:{display:false}},y:{ticks:{font:chartFont,callback:function(v){return v>=1000?'$'+(v/1000).toFixed(0)+'K':'$'+v;}},grid:{color:'rgba(0,0,0,.04)'},beginAtZero:true}}}
+  });
+
+
+
+  // Overdue banner
+  var odItems=data.filter(function(d){return d.status==='Overdue';});
+  var bannerHtml='';
+  if(odItems.length>0){
+    var deep=odItems.filter(function(d){var ms=parseDateMs(d.dueDate);return ms&&(now.getTime()-ms)/86400000>45;});
+    bannerHtml='<div style="background:linear-gradient(135deg,#e11d48,#be123c);border-radius:12px;padding:16px 22px;color:#fff;display:flex;align-items:center;gap:16px;flex-wrap:wrap;box-shadow:0 6px 20px rgba(225,29,72,.2)">'+
+      '<div style="font-size:22px">⚠️</div><div style="flex:1">'+
+      '<div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:1px;opacity:.75;margin-bottom:3px">Overdue Risk Alert</div>'+
+      '<div style="font-size:13px;font-weight:500">'+odItems.length+' invoice(s) overdue · Total: <strong>'+fmtK(overdueAmt)+'</strong>'+
+      (deep.length>0?' · <span style="background:rgba(255,255,255,.2);padding:2px 10px;border-radius:20px;font-size:12px">'+deep.length+' invoices >45 days: '+fmtK(deep.reduce(function(a,d){return a+d.pending;},0))+'</span>':'')+
+      '</div></div><div style="font-size:11px;opacity:.65;font-style:italic">Risk: late fees & supplier relationship damage</div></div>';
+  }
+  document.getElementById('overdueRiskBanner').innerHTML=bannerHtml;
+
+  // Action table
+  var aItems=data.filter(function(d){return d.status!=='Paid';});
+  aItems.sort(function(a,b){
+    var pa=priorityOrder[a.priority]!==undefined?priorityOrder[a.priority]:9;
+    var pb=priorityOrder[b.priority]!==undefined?priorityOrder[b.priority]:9;
+    if(pa!==pb) return pa-pb;
+    return (parseDateMs(a.dueDate)||9999999999999)-(parseDateMs(b.dueDate)||9999999999999);
+  });
+  document.getElementById('actionCount').textContent=aItems.length+' items';
+  document.getElementById('urgentTableBody').innerHTML=aItems.map(function(d){
+    var dueMs=parseDateMs(d.dueDate);
+    var aging='—';
+    if(dueMs){var diff=Math.round((now.getTime()-dueMs)/86400000);aging=diff>0?'<span style="color:#e11d48;font-weight:700">+'+diff+'d overdue</span>':'<span style="color:#0f766e;font-weight:600">'+Math.abs(diff)+'d left</span>';}
+    var amtC=d.status==='Overdue'?'#e11d48':d.status==='Due Soon'?'#ca8a04':'var(--text)';
+    return '<tr>'+
+      '<td class="tbl-supplier">'+d.supplier+'</td>'+
+      '<td class="tbl-inv">'+d.inv+'</td>'+
+      '<td class="tbl-date">'+d.dueDate+'</td>'+
+      '<td class="amt" style="color:'+amtC+'">'+fmt(d.pending)+'</td>'+
+      '<td class="center">'+badge(d.status)+'</td>'+
+      '<td style="white-space:nowrap">'+d.priority+'</td>'+
+      '<td class="tbl-aging center">'+aging+'</td>'+
+      '<td class="tbl-note">'+(d.note||'—')+'</td>'+
+      '</tr>';
+  }).join('')||'<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--muted)">No pending invoices ✅</td></tr>';
+}
+
+// ===== MONTHLY PAYABLES =====
+function initMonthlyPage(){
+  var curMonth=monthAbbr[new Date().getMonth()];
+  var sel=document.getElementById('mp-month');
+  if(sel&&sel.value==='') sel.value=curMonth;
+  applyMonthlyFilter();
+}
+function resetMonthlyFilter(){
+  document.getElementById('mp-month').value='';
+  document.getElementById('mp-priority').value='';
+  document.getElementById('mp-status').value='';
+  applyMonthlyFilter();
+}
+function applyMonthlyFilter(){
+  var month=document.getElementById('mp-month').value;
+  var priority=document.getElementById('mp-priority').value;
+  var status=document.getElementById('mp-status').value;
+  var supplier=document.getElementById('mp-supplier')?document.getElementById('mp-supplier').value:'';
+  var search=(document.getElementById('mp-search')?document.getElementById('mp-search').value:'').toLowerCase();
+
+  // Populate supplier dropdown
+  var dd=document.getElementById('mp-supplier');
+  if(dd){
+    var suppliers=[];
+    allData.forEach(function(d){if(suppliers.indexOf(d.supplier)<0) suppliers.push(d.supplier);});
+    suppliers.sort();
+    var prev=dd.value;
+    dd.innerHTML='<option value="">All Suppliers</option>'+suppliers.map(function(s){return '<option value="'+s+'">'+s+'</option>';}).join('');
+    if(prev) dd.value=prev;
+    supplier=dd.value;
+  }
+
+  var data=allData.filter(function(d){
+    if(month&&d.monthDebt!==month) return false;
+    if(priority&&d.priority!==priority) return false;
+    if(status&&d.status!==status) return false;
+    if(supplier&&d.supplier!==supplier) return false;
+    if(search&&JSON.stringify(d).toLowerCase().indexOf(search)<0) return false;
+    return true;
+  });
+  var total=data.reduce(function(a,d){return a+d.pending;},0);
+  var urgent=data.filter(function(d){return d.priority.indexOf('Urgent')>=0;}).reduce(function(a,d){return a+d.pending;},0);
+  var planned=data.filter(function(d){return d.priority.indexOf('Planned')>=0;}).reduce(function(a,d){return a+d.pending;},0);
+  var consider=data.filter(function(d){return d.priority.indexOf('Consider')>=0;}).reduce(function(a,d){return a+d.pending;},0);
+  var tInvoice=data.reduce(function(a,d){return a+d.amount;},0);
+  var tPaidKpi=data.reduce(function(a,d){return a+d.paid;},0);
+  document.getElementById('monthlyKpiRow').innerHTML=
+    // Card 1: Total Invoice Amount
+    '<div style="background:#fff;border:1px solid var(--border);border-left:4px solid #4f46e5;border-radius:12px;padding:20px 22px;box-shadow:var(--shadow-sm)">'+
+      '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px">📄 Total Invoice Amount</div>'+
+      '<div style="font-size:30px;font-weight:800;color:#4f46e5;letter-spacing:-.6px">'+fmtK(tInvoice)+'</div>'+
+      '<div style="font-size:11px;color:var(--muted);margin-top:5px">'+data.length+' invoices</div>'+
+    '</div>'+
+    // Card 2: Total Paid
+    '<div style="background:#fff;border:1px solid var(--border);border-left:4px solid #0f766e;border-radius:12px;padding:20px 22px;box-shadow:var(--shadow-sm)">'+
+      '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px">✅ Total Paid</div>'+
+      '<div style="font-size:30px;font-weight:800;color:#0f766e;letter-spacing:-.6px">'+fmtK(tPaidKpi)+'</div>'+
+      '<div style="font-size:11px;color:var(--muted);margin-top:5px">'+(tInvoice>0?'~'+(tPaidKpi/tInvoice*100).toFixed(1)+'% of total invoiced':'—')+'</div>'+
+    '</div>'+
+    // Card 3: Total Pending (with breakdown)
+    '<div style="background:linear-gradient(135deg,#e11d48,#be123c);border-radius:12px;padding:20px 22px;box-shadow:0 6px 20px rgba(225,29,72,.2);position:relative;overflow:hidden">'+
+      '<div style="position:absolute;right:-8px;top:-8px;font-size:52px;opacity:.12">⏳</div>'+
+      '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,.65);margin-bottom:8px">⏳ Total Pending</div>'+
+      '<div style="font-size:30px;font-weight:800;color:#fff;letter-spacing:-.6px;margin-bottom:10px">'+fmtK(total)+'</div>'+
+      '<div style="display:flex;flex-direction:column;gap:5px">'+
+        '<div style="display:flex;justify-content:space-between;align-items:center;font-size:11px">'+
+          '<span style="color:rgba(255,255,255,.7)">🔴 Urgent</span>'+
+          '<span style="font-weight:700;color:#fff">'+fmtK(urgent)+(total>0?' <span style="font-weight:400;color:rgba(255,255,255,.55);font-size:10px">('+( urgent/total*100).toFixed(0)+'%)</span>':'')+'</span>'+
+        '</div>'+
+        '<div style="display:flex;justify-content:space-between;align-items:center;font-size:11px">'+
+          '<span style="color:rgba(255,255,255,.7)">🟠 Planned</span>'+
+          '<span style="font-weight:700;color:#fff">'+fmtK(planned)+(total>0?' <span style="font-weight:400;color:rgba(255,255,255,.55);font-size:10px">('+( planned/total*100).toFixed(0)+'%)</span>':'')+'</span>'+
+        '</div>'+
+        '<div style="display:flex;justify-content:space-between;align-items:center;font-size:11px">'+
+          '<span style="color:rgba(255,255,255,.7)">🟢 Consider</span>'+
+          '<span style="font-weight:700;color:#fff">'+fmtK(consider)+(total>0?' <span style="font-weight:400;color:rgba(255,255,255,.55);font-size:10px">('+( consider/total*100).toFixed(0)+'%)</span>':'')+'</span>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  document.getElementById('monthly-count').textContent=data.length+' items';
+  document.getElementById('monthly-subtitle').textContent=data.length+' invoices requiring payment';
+  data.sort(function(a,b){
+    var pa=priorityOrder[a.priority]!==undefined?priorityOrder[a.priority]:9;
+    var pb=priorityOrder[b.priority]!==undefined?priorityOrder[b.priority]:9;
+    if(pa!==pb) return pa-pb;
+    return (parseDateMs(a.dueDate)||9999999999999)-(parseDateMs(b.dueDate)||9999999999999);
+  });
+  document.getElementById('monthlyTableBody').innerHTML=data.map(function(d,i){
+    var amtC=d.status==='Overdue'?'#e11d48':d.status==='Due Soon'?'#ca8a04':'var(--text)';
+    return '<tr>'+
+      '<td style="color:var(--muted);font-size:11px;text-align:right;width:32px">'+(i+1)+'</td>'+
+      '<td class="tbl-supplier">'+d.supplier+'</td>'+
+      '<td class="tbl-inv">'+d.inv+'</td>'+
+      '<td class="tbl-date">'+d.dueDate+'</td>'+
+      '<td class="amt">'+fmt(d.amount)+'</td>'+
+      '<td class="amt" style="color:#e11d48;font-weight:500">'+(d.paid>0?'−'+fmt(d.paid):'$0')+'</td>'+
+      '<td class="amt" style="color:#4f46e5;font-weight:600">'+(d.pending>0?fmt(d.pending):'$0')+'</td>'+
+      '<td class="center">'+badge(d.status)+'</td>'+
+      '<td style="white-space:nowrap">'+d.priority+'</td>'+
+      '<td class="tbl-date center">'+(d.pmtDate||'—')+'</td>'+
+      '<td class="tbl-note" style="max-width:200px;white-space:normal;font-size:12px;color:var(--muted)">'+(d.note||'—')+'</td>'+
+      '</tr>';
+  }).join('')||'<tr><td colspan="11" style="text-align:center;padding:24px;color:var(--muted)">No invoices found ✅</td></tr>';
+  // Total row
+  var tAmount=data.reduce(function(a,d){return a+d.amount;},0);
+  var tPaid=data.reduce(function(a,d){return a+d.paid;},0);
+  var tPending=data.reduce(function(a,d){return a+d.pending;},0);
+  var tr=document.getElementById('monthlyTotalRow');
+  if(tr) tr.innerHTML=
+    '<td colspan="4" class="total-label">Total — '+data.length+' invoices</td>'+
+    '<td class="total-amt amt-total">'+fmt(tAmount)+'</td>'+
+    '<td class="total-amt amt-paid">−'+fmt(tPaid)+'</td>'+
+    '<td class="total-amt amt-pending">'+fmt(tPending)+'</td>'+
+    '<td colspan="4"></td>';
+}
+
+// ===== SUPPLIER INFO =====
+function renderSupplierInfo(){
+  var supMap={};
+  allData.forEach(function(d){
+    if(!supMap[d.supplier]) supMap[d.supplier]={bank:d.bank,bankAcc:d.bankAcc||'—',swift:d.swift||'—',total:0,paid:0,pending:0,statuses:[]};
+    supMap[d.supplier].total+=d.amount;
+    supMap[d.supplier].paid+=d.paid;
+    supMap[d.supplier].pending+=d.pending;
+    if(supMap[d.supplier].statuses.indexOf(d.status)<0) supMap[d.supplier].statuses.push(d.status);
+  });
+  var suppliers=Object.keys(supMap).sort();
+
+  // Populate dropdown
+  var dd=document.getElementById('supplierDropdown');
+  var prev=dd.value;
+  dd.innerHTML='<option value="">All Suppliers</option>'+suppliers.map(function(s){return '<option value="'+s+'">'+s+'</option>';}).join('');
+  if(prev) dd.value=prev;
+
+  function renderRows(list){
+    document.getElementById('supplierInfoBody').innerHTML=list.map(function(sup,i){
+      var s=supMap[sup];
+      var ms;
+      if(s.pending<=0){
+        ms='Paid';
+      } else {
+        var unpaidStatuses=[];
+        allData.filter(function(d){return d.supplier===sup&&d.pending>0;}).forEach(function(d){
+          if(unpaidStatuses.indexOf(d.status)<0) unpaidStatuses.push(d.status);
+        });
+        var so=['Overdue','Due Soon','Pending','Blocked'];
+        ms='Pending';
+        for(var si=0;si<so.length;si++){if(unpaidStatuses.indexOf(so[si])>=0){ms=so[si];break;}}
+      }
+      return '<tr>'+
+        '<td style="color:var(--muted);font-size:11px;text-align:right">'+(i+1)+'</td>'+
+        '<td class="tbl-supplier">'+sup+'</td>'+
+        '<td style="font-size:12px;white-space:nowrap">'+s.bank+'</td>'+
+        '<td class="tbl-inv">'+s.bankAcc+'</td>'+
+        '<td style="font-size:12px;letter-spacing:.5px;white-space:nowrap;color:var(--muted)">'+s.swift+'</td>'+
+        '</tr>';
+    }).join('');
+  }
+
+  var selected=dd.value;
+  renderRows(selected?suppliers.filter(function(s){return s===selected;}):suppliers);
+
+  // Store renderRows for filter use
+  window._supRenderRows=renderRows;
+  window._supList=suppliers;
+}
+function filterSupplierInfo(val){
+  if(window._supRenderRows&&window._supList){
+    window._supRenderRows(val?window._supList.filter(function(s){return s===val;}):window._supList);
+  }
+}
+function searchSupplierInfo(q){
+  q=q.toLowerCase();
+  document.querySelectorAll('#supplierInfoBody tr').forEach(function(row){
+    row.style.display=row.textContent.toLowerCase().indexOf(q)>=0?'':'none';
+  });
+}
+
+// ===== AGING =====
+var agingDonutInst=null,agingSupInst=null;
+function renderAging(){
+  if(agingDonutInst){agingDonutInst.destroy();agingDonutInst=null;}
+  if(agingSupInst){agingSupInst.destroy();agingSupInst=null;}
+  var now=new Date().getTime();
+  var bDefs=[
+    {label:'Not Yet Due',hex:'#4f46e5',items:[]},
+    {label:'0–30 Days OD',hex:'#ca8a04',items:[]},
+    {label:'31–60 Days OD',hex:'#e11d48',items:[]},
+    {label:'61–90 Days OD',hex:'#7f1d1d',items:[]},
+    {label:'Blocked / N/A',hex:'#94a3b8',items:[]}
+  ];
+  allData.filter(function(d){return d.pending>0;}).forEach(function(d){
+    if(d.status==='Blocked'||d.dueDate==='—'){bDefs[4].items.push(d);return;}
+    var dueMs=parseDateMs(d.dueDate);if(!dueMs){bDefs[4].items.push(d);return;}
+    var diff=(now-dueMs)/86400000;
+    if(diff<-7) bDefs[0].items.push(d);
+    else if(diff<=30) bDefs[1].items.push(d);
+    else if(diff<=60) bDefs[2].items.push(d);
+    else bDefs[3].items.push(d);
+  });
+  document.getElementById('agingGrid').innerHTML=bDefs.map(function(b){
+    var total=b.items.reduce(function(a,d){return a+d.pending;},0);
+    return '<div class="aging-card" style="border-top:3px solid '+b.hex+'"><div class="aging-label">'+b.label+'</div>'+
+      '<div class="aging-val" style="color:'+b.hex+'">'+fmt(total)+'</div>'+
+      '<div class="aging-count">'+b.items.length+' invoice'+(b.items.length!==1?'s':'')+'</div></div>';
+  }).join('');
+  var aVals=bDefs.map(function(b){return b.items.reduce(function(a,d){return a+d.pending;},0);});
+  var aTotal=aVals.reduce(function(a,b){return a+b;},0);
+  agingDonutInst=new Chart(document.getElementById('agingDonut'),{
+    type:'doughnut',
+    data:{labels:bDefs.map(function(b){return b.label;}),datasets:[{data:aVals,backgroundColor:bDefs.map(function(b){return b.hex;}),borderWidth:2,borderColor:'#fff',hoverOffset:6}]},
+    options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:30,bottom:30,left:60,right:60}},
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){var v=ctx.raw||0;return ' '+fmtK(v)+' ('+(aTotal>0?(v/aTotal*100).toFixed(1):0)+'%)';}}}}
+      ,cutout:'62%'},
+    plugins:[{id:'ac',afterDraw:function(chart){
+      var c=chart.ctx,cx=chart.chartArea.left+(chart.chartArea.right-chart.chartArea.left)/2,cy=chart.chartArea.top+(chart.chartArea.bottom-chart.chartArea.top)/2;
+      c.save();c.textAlign='center';c.textBaseline='middle';
+      c.font='700 14px Inter,sans-serif';c.fillStyle='#0d1b2e';c.fillText(fmtK(aTotal),cx,cy-8);
+      c.font='400 10px Inter,sans-serif';c.fillStyle='#5a6e85';c.fillText('Outstanding',cx,cy+9);
+      var meta=chart.getDatasetMeta(0);
+      meta.data.forEach(function(arc,i){
+        var val=aVals[i];if(!val) return;
+        var pct=(val/aTotal*100).toFixed(1);var lbl=bDefs[i].label+' '+pct+'%';
+        var angle=arc.startAngle+(arc.endAngle-arc.startAngle)/2;var r=arc.outerRadius;
+        var x3=cx+Math.cos(angle)*(r+24),y3=cy+Math.sin(angle)*(r+24);var isR=Math.cos(angle)>=0;
+        c.save();c.strokeStyle=bDefs[i].hex;c.lineWidth=1.2;
+        c.beginPath();c.moveTo(cx+Math.cos(angle)*r,cy+Math.sin(angle)*r);c.lineTo(cx+Math.cos(angle)*(r+12),cy+Math.sin(angle)*(r+12));c.lineTo(x3,y3);c.stroke();
+        c.font='500 10px Inter,sans-serif';c.fillStyle='#0d1b2e';c.textAlign=isR?'left':'right';c.textBaseline='middle';
+        c.fillText(lbl,isR?x3+4:x3-4,y3);c.restore();
+      });
+      c.restore();
+    }}]
+  });
+  var pRows=allData.filter(function(d){return d.pending>0;});
+  var sOut=[];pRows.forEach(function(d){if(sOut.indexOf(d.supplier)<0) sOut.push(d.supplier);});
+  var sVals=sOut.map(function(s){return pRows.filter(function(d){return d.supplier===s;}).reduce(function(a,d){return a+d.pending;},0);});
+  var bP=['#3730a3','#4f46e5','#6366f1','#818cf8','#a5b4fc','#c7d2fe','#eef2ff','#eef2ff'];
+  agingSupInst=new Chart(document.getElementById('agingSupplier'),{
+    type:'bar',
+    data:{labels:sOut.map(function(s){return s.length>22?s.slice(0,20)+'…':s;}),datasets:[{label:'Outstanding USD',data:sVals,backgroundColor:sOut.map(function(s,i){return bP[i%bP.length];}),borderWidth:0,borderRadius:3}]},
+    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},
+      scales:{x:{ticks:{font:chartFont,callback:function(v){return v>=1000?'$'+(v/1000).toFixed(0)+'K':'$'+v;}},grid:{color:'rgba(0,0,0,.05)'}},y:{ticks:{font:{family:"'Inter',sans-serif",size:10}},grid:{display:false}}}}
+  });
+  document.getElementById('agingTableBody').innerHTML=allData.filter(function(d){return d.pending>0;}).map(function(d){
+    var dueMs=parseDateMs(d.dueDate);var dH='<span style="color:var(--muted)">N/A</span>';var bB=badge('Blocked');
+    if(dueMs){var diff=Math.round((new Date().getTime()-dueMs)/86400000);
+      dH='<span style="color:'+(diff>0?'#e11d48':'#0f766e')+';font-weight:700">'+( diff>0?'+':'')+diff+' days</span>';
+      bB=diff>60?'<span class="badge badge-overdue">61–90 days</span>':diff>30?'<span class="badge badge-overdue">31–60 days</span>':diff>0?'<span class="badge badge-overdue">0–30 days OD</span>':diff>-7?'<span class="badge badge-duesoon">Due Soon</span>':'<span class="badge badge-pending">Not Yet Due</span>';
+    }
+    return '<tr>'+
+      '<td class="tbl-supplier">'+d.supplier+'</td>'+
+      '<td class="tbl-inv">'+d.inv+'</td>'+
+      '<td class="tbl-date">'+d.dueDate+'</td>'+
+      '<td class="tbl-aging center">'+dH+'</td>'+
+      '<td class="amt">'+fmt(d.pending)+'</td>'+
+      '<td class="center">'+bB+'</td>'+
+      '<td style="white-space:nowrap">'+d.priority+'</td>'+
+      '</tr>';
+  }).join('');
+}
+
+// ===== INVOICE DETAIL =====
+var currentFilter='all';
+function renderDetailTable(data){
+  document.getElementById('detail-subtitle').textContent=data.length+' invoices';
+  document.getElementById('detail-count').textContent=data.length+' items';
+  document.getElementById('mainTableBody').innerHTML=data.map(function(d,i){
+    return '<tr>'+
+      '<td style="color:var(--muted);font-size:11px;text-align:right">'+(i+1)+'</td>'+
+      '<td class="tbl-supplier">'+d.supplier+'</td>'+
+      '<td class="tbl-inv">'+d.inv+'</td>'+
+      '<td class="tbl-date">'+d.invDate+'</td>'+
+      '<td class="tbl-date">'+d.dueDate+'</td>'+
+      '<td class="amt">'+fmt(d.amount)+'</td>'+
+      '<td class="amt" style="color:#e11d48;font-weight:500">'+(d.paid>0?'−'+fmt(d.paid):'$0')+'</td>'+
+      '<td class="amt" style="color:'+(d.pending>0?'#4f46e5':'var(--muted)')+'">'+fmt(d.pending)+'</td>'+
+      '<td class="center">'+badge(d.status)+'</td>'+
+      '<td style="white-space:nowrap">'+d.priority+'</td>'+
+      '<td class="tbl-date center">'+(d.pmtDate||'—')+'</td>'+
+      '<td class="tbl-note">'+(d.note||'—')+'</td>'+
+      '</tr>';
+  }).join('')||'<tr><td colspan="12" style="text-align:center;padding:24px;color:var(--muted)">No invoices found ✅</td></tr>';
+  // Total row
+  var tAmt=data.reduce(function(a,d){return a+d.amount;},0);
+  var tPaid=data.reduce(function(a,d){return a+d.paid;},0);
+  var tPending=data.reduce(function(a,d){return a+d.pending;},0);
+  var tr=document.getElementById('detailTotalRow');
+  if(tr) tr.innerHTML=
+    '<td colspan="5" class="total-label">Total — '+data.length+' invoices</td>'+
+    '<td class="total-amt amt-total">'+fmt(tAmt)+'</td>'+
+    '<td class="total-amt amt-paid">−'+fmt(tPaid)+'</td>'+
+    '<td class="total-amt amt-pending">'+fmt(tPending)+'</td>'+
+    '<td colspan="4"></td>';
+}
+function filterStatus(status,btn){
+  currentFilter=status;
+  document.querySelectorAll('.filter-btn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  applyDetailFilters();
+}
+function filterDetailTable(q){applyDetailFilters();}
+function applyDetailFilters(){
+  // Populate dropdowns
+  var ddSup=document.getElementById('detail-supplier');
+  var ddPmt=document.getElementById('detail-pmtdate');
+  if(ddSup){
+    var sups=[];
+    allData.forEach(function(d){if(sups.indexOf(d.supplier)<0) sups.push(d.supplier);});
+    sups.sort();
+    var prevS=ddSup.value;
+    ddSup.innerHTML='<option value="">All Suppliers</option>'+sups.map(function(s){return '<option value="'+s+'">'+s+'</option>';}).join('');
+    if(prevS) ddSup.value=prevS;
+  }
+  if(ddPmt){
+    var pmtMonths=[];
+    allData.forEach(function(d){
+      if(!d.pmtDate||d.pmtDate==='—') return;
+      // Extract month label from date e.g. "26-Mar-2026" → "Mar-2026"
+      var parts=d.pmtDate.split('-');
+      var label='';
+      if(parts.length===3){
+        label=parts[1]+'-'+parts[2]; // e.g. "Mar-2026"
+      } else {
+        label=d.pmtDate;
+      }
+      if(pmtMonths.indexOf(label)<0) pmtMonths.push(label);
+    });
+    // Sort by date
+    pmtMonths.sort(function(a,b){
+      var ma=new Date(a.replace(/(\w+)-(\d+)/,'$1 $2'));
+      var mb=new Date(b.replace(/(\w+)-(\d+)/,'$1 $2'));
+      return ma-mb;
+    });
+    var prevP=ddPmt.value;
+    ddPmt.innerHTML='<option value="">All PMT Month</option>'+pmtMonths.map(function(p){return '<option value="'+p+'">'+p+'</option>';}).join('');
+    if(prevP) ddPmt.value=prevP;
+  }
+
+  var supplier=ddSup?ddSup.value:'';
+  var pmtDate=ddPmt?ddPmt.value:'';
+  var priority=document.getElementById('detail-priority')?document.getElementById('detail-priority').value:'';
+  var status=document.getElementById('detail-status')?document.getElementById('detail-status').value:'';
+
+  var data=allData.filter(function(d){
+    if(supplier&&d.supplier!==supplier) return false;
+    if(pmtDate){
+      // Match by month-year label e.g. "Mar-2026"
+      var dParts=d.pmtDate?d.pmtDate.split('-'):[];
+      var dLabel=dParts.length===3?dParts[1]+'-'+dParts[2]:'';
+      if(dLabel!==pmtDate) return false;
+    }
+    if(priority&&d.priority!==priority) return false;
+    if(status&&d.status!==status) return false;
+    return true;
+  });
+  renderDetailTable(data);
+}
+
+// ===== INIT =====
+loadData();
+</script>
+</body>
+</html>
