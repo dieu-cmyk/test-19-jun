@@ -8,30 +8,30 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root{
-  /* ── 5-colour palette: Slate · Indigo · Amber · Rose · White ── */
-  --bg:#f1f5f9;
+  /* ── Professional palette: Cool Blue · Slate ── */
+  --bg:#edf1f7;
   --surface:#ffffff;
-  --surface2:#f8fafc;
-  --surface3:#f1f5f9;
-  --border:#e2e8f0;
-  --border-light:#f1f5f9;
+  --surface2:#f4f7fb;
+  --surface3:#edf1f7;
+  --border:#d0dcef;          /* Secondary bar colour        */
+  --border-light:#e8eef7;
 
-  --accent:#4f46e5;          /* Indigo-600  – primary action */
-  --accent-light:#eef2ff;    /* Indigo-50   – subtle bg     */
-  --accent-mid:#c7d2fe;      /* Indigo-200  – border tint   */
+  --accent:#5b7fd4;          /* Primary blue (softer)       */
+  --accent-light:#eaf0fb;    /* Subtle bg tint              */
+  --accent-mid:#d0dcef;      /* Border tint                 */
 
-  --warn:#ca8a04;            /* Amber-600   – planned/warn  */
-  --warn-light:#fefce8;      /* Amber-50                    */
+  --warn:#c07a1a;            /* Amber – planned/warn        */
+  --warn-light:#fdf6e8;
 
-  --danger:#e11d48;          /* Rose-600    – overdue/urgent*/
-  --danger-light:#fff1f2;    /* Rose-50                     */
+  --danger:#c93a3a;          /* Rose – overdue/urgent       */
+  --danger-light:#fdf0f0;
 
-  --success:#0f766e;         /* Teal-700    – paid (neutral)*/
+  --success:#1a7a6e;         /* Teal – paid                 */
 
-  --text:#0f172a;            /* Slate-900                   */
-  --text2:#334155;           /* Slate-700                   */
-  --muted:#64748b;           /* Slate-500                   */
-  --muted-light:#94a3b8;     /* Slate-400                   */
+  --text:#0f172a;
+  --text2:#2d3f58;
+  --muted:#5a6e85;
+  --muted-light:#8a9fb8;
 
   --sidebar-w:224px;
   --shadow-sm:0 1px 3px rgba(15,23,42,.05),0 1px 2px rgba(15,23,42,.04);
@@ -41,16 +41,16 @@
 body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;overflow-x:hidden}
 
 /* ── SIDEBAR ── */
-.sidebar{position:fixed;top:0;left:0;width:var(--sidebar-w);height:100vh;background:#1e293b;display:flex;flex-direction:column;z-index:100;padding:0 0 20px;box-shadow:4px 0 24px rgba(0,0,0,.12)}
+.sidebar{position:fixed;top:0;left:0;width:var(--sidebar-w);height:100vh;background:#1c2b3a;display:flex;flex-direction:column;z-index:100;padding:0 0 20px;box-shadow:4px 0 24px rgba(0,0,0,.12)}
 .logo{padding:22px 18px 18px;border-bottom:1px solid rgba(255,255,255,.07)}
-.logo-avatar{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#4f46e5);display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;margin-bottom:12px;box-shadow:0 4px 12px rgba(99,102,241,.35)}
+.logo-avatar{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#5b7fd4,#3b5bdb);display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;margin-bottom:12px;box-shadow:0 4px 12px rgba(91,127,212,.35)}
 .logo-title{font-size:14px;font-weight:700;color:#f8fafc;letter-spacing:-.2px}
 .logo-sub{font-size:10.5px;color:rgba(255,255,255,.35);margin-top:3px;letter-spacing:.2px}
 nav{flex:1;padding:14px 10px;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
 .nav-section{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,.25);padding:12px 8px 5px}
 .nav-item{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;color:rgba(255,255,255,.52);transition:all .15s;border:1px solid transparent}
 .nav-item:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.88)}
-.nav-item.active{background:rgba(99,102,241,.2);color:#a5b4fc;font-weight:600;border-color:rgba(99,102,241,.3)}
+.nav-item.active{background:rgba(91,127,212,.2);color:#a8bfe8;font-weight:600;border-color:rgba(91,127,212,.3)}
 .nav-icon{font-size:14px;width:18px;text-align:center;opacity:.85}
 .sidebar-footer{padding:12px 18px;border-top:1px solid rgba(255,255,255,.07);font-size:10.5px;color:rgba(255,255,255,.3);letter-spacing:.1px}
 
@@ -108,7 +108,7 @@ tbody td.wrap{white-space:normal;min-width:160px;max-width:220px}
 
 /* ── TOTAL ROW — HIGHLIGHTED ── */
 tr.total-row td{
-  background:linear-gradient(90deg,#eef2ff 0%,#f5f3ff 100%);
+  background:linear-gradient(90deg,#eaf0fb 0%,#eaf0fb 100%);
   border-top:2px solid var(--accent-mid) !important;
   border-bottom:2px solid var(--accent-mid) !important;
 }
@@ -125,7 +125,7 @@ tr.total-row td.total-amt.amt-pending{color:var(--accent)}
 /* ── BADGES ── */
 .badge{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.2px}
 .badge-paid{background:#ccfbf1;color:#0f766e}
-.badge-pending{background:var(--accent-light);color:#3730a3}
+.badge-pending{background:var(--accent-light);color:#3b5bdb}
 .badge-overdue{background:var(--danger-light);color:#9f1239}
 .badge-blocked{background:#f1f5f9;color:#475569}
 .badge-duesoon{background:var(--warn-light);color:#92400e}
@@ -158,14 +158,14 @@ tr.total-row td.total-amt.amt-pending{color:var(--accent)}
 body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;overflow-x:hidden}
 .sidebar{position:fixed;top:0;left:0;width:var(--sidebar-w);height:100vh;background:#0f172a;display:flex;flex-direction:column;z-index:100;padding:0 0 20px;box-shadow:4px 0 20px rgba(0,0,0,.15)}
 .logo{padding:22px 18px 18px;border-bottom:1px solid rgba(255,255,255,.07)}
-.logo-avatar{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#3730a3);display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;margin-bottom:12px;box-shadow:0 4px 12px rgba(59,130,246,.4)}
+.logo-avatar{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#5b7fd4,#3b5bdb);display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;margin-bottom:12px;box-shadow:0 4px 12px rgba(59,130,246,.4)}
 .logo-title{font-size:14px;font-weight:700;color:#f8fafc;letter-spacing:-.2px}
 .logo-sub{font-size:10.5px;color:rgba(255,255,255,.38);margin-top:3px;letter-spacing:.2px}
 nav{flex:1;padding:14px 10px;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
 .nav-section{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,.28);padding:12px 8px 5px}
 .nav-item{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;color:rgba(255,255,255,.55);transition:all .15s;border:1px solid transparent}
 .nav-item:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.9)}
-.nav-item.active{background:rgba(59,130,246,.18);color:#a5b4fc;font-weight:600;border-color:rgba(59,130,246,.25)}
+.nav-item.active{background:rgba(59,130,246,.18);color:#a8bfe8;font-weight:600;border-color:rgba(59,130,246,.25)}
 .nav-icon{font-size:14px;width:18px;text-align:center;opacity:.9}
 .sidebar-footer{padding:12px 18px;border-top:1px solid rgba(255,255,255,.07);font-size:10.5px;color:rgba(255,255,255,.32);letter-spacing:.1px}
 
@@ -223,7 +223,7 @@ tbody td.wrap{white-space:normal;min-width:160px;max-width:220px}
 
 /* ── TOTAL ROW — HIGHLIGHTED ── */
 tr.total-row td{
-  background:linear-gradient(90deg,#eef2ff 0%,#f0f9ff 100%);
+  background:linear-gradient(90deg,#eaf0fb 0%,#f0f9ff 100%);
   border-top:2px solid var(--accent-mid) !important;
   border-bottom:2px solid var(--accent-mid) !important;
 }
@@ -240,7 +240,7 @@ tr.total-row td.total-amt.amt-pending{color:var(--accent)}
 /* ── BADGES ── */
 .badge{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.2px}
 .badge-paid{background:#d1fae5;color:#065f46}
-.badge-pending{background:#eef2ff;color:#3730a3}
+.badge-pending{background:#eaf0fb;color:#3b5bdb}
 .badge-overdue{background:#fff1f2;color:#9f1239}
 .badge-blocked{background:#e2e8f0;color:#475569}
 .badge-duesoon{background:#fef3c7;color:#92400e}
@@ -707,7 +707,7 @@ function renderOverview(data){
   var plannedCount=data.filter(function(d){return d.priority.indexOf('Planned')>=0&&d.status!=='Paid';}).length;
   var considerCount=data.filter(function(d){return d.priority.indexOf('Consider')>=0&&d.status!=='Paid';}).length;
   document.getElementById('execKpiGrid').innerHTML=[
-    {label:'Total AP Outstanding',icon:'💰',border:'#4f46e5',bg:'linear-gradient(135deg,#4f46e5,#3730a3)',value:fmtK(totalAP),pct:null,meta:pendingCount+' invoices · '+suppliers.length+' suppliers',color:'#fff',heroCard:true},
+    {label:'Total AP Outstanding',icon:'💰',border:'#5b7fd4',bg:'linear-gradient(135deg,#5b7fd4,#3b5bdb)',value:fmtK(totalAP),pct:null,meta:pendingCount+' invoices · '+suppliers.length+' suppliers',color:'#fff',heroCard:true},
     {label:'Urgent — Action Required',icon:'🚨',border:'#e11d48',bg:'#fff',value:fmtK(urgentAmt),pct:totalAP>0?(urgentAmt/totalAP*100).toFixed(1)+'%':null,meta:urgentCount+' invoices',color:'#e11d48',heroCard:false},
     {label:'Planned — Due Soon',icon:'📋',border:'#ca8a04',bg:'#fff',value:fmtK(plannedAmt),pct:totalAP>0?(plannedAmt/totalAP*100).toFixed(1)+'%':null,meta:plannedCount+' invoices',color:'#ca8a04',heroCard:false},
     {label:'Consider — Under Review',icon:'💡',border:'#0f766e',bg:'#fff',value:fmtK(considerAmt),pct:totalAP>0?(considerAmt/totalAP*100).toFixed(1)+'%':null,meta:considerCount+' invoices',color:'#0f766e',heroCard:false}
@@ -785,8 +785,8 @@ function renderOverview(data){
   trendChartInst=new Chart(document.getElementById('trendChart'),{
     type:'bar',
     data:{labels:tK,datasets:[
-      {label:'Total Invoiced',data:tK.map(function(k){return mT[k].total;}),backgroundColor:'#c7d2fe',borderWidth:0,borderRadius:4,order:2},
-      {label:'Paid',data:tK.map(function(k){return mT[k].paid;}),backgroundColor:'#4f46e5',borderWidth:0,borderRadius:4,order:1}
+      {label:'Total Invoiced',data:tK.map(function(k){return mT[k].total;}),backgroundColor:'#d0dcef',borderWidth:0,borderRadius:4,order:2},
+      {label:'Paid',data:tK.map(function(k){return mT[k].paid;}),backgroundColor:'#5b7fd4',borderWidth:0,borderRadius:4,order:1}
     ]},
     options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
       plugins:{legend:{position:'top',align:'end',labels:{font:chartFont,usePointStyle:true,pointStyle:'circle',padding:14}}},
@@ -884,9 +884,9 @@ function applyMonthlyFilter(){
   var tPaidKpi=data.reduce(function(a,d){return a+d.paid;},0);
   document.getElementById('monthlyKpiRow').innerHTML=
     // Card 1: Total Invoice Amount
-    '<div style="background:#fff;border:1px solid var(--border);border-left:4px solid #4f46e5;border-radius:12px;padding:20px 22px;box-shadow:var(--shadow-sm)">'+
+    '<div style="background:#fff;border:1px solid var(--border);border-left:4px solid #5b7fd4;border-radius:12px;padding:20px 22px;box-shadow:var(--shadow-sm)">'+
       '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px">📄 Total Invoice Amount</div>'+
-      '<div style="font-size:30px;font-weight:800;color:#4f46e5;letter-spacing:-.6px">'+fmtK(tInvoice)+'</div>'+
+      '<div style="font-size:30px;font-weight:800;color:#5b7fd4;letter-spacing:-.6px">'+fmtK(tInvoice)+'</div>'+
       '<div style="font-size:11px;color:var(--muted);margin-top:5px">'+data.length+' invoices</div>'+
     '</div>'+
     // Card 2: Total Paid
@@ -932,7 +932,7 @@ function applyMonthlyFilter(){
       '<td class="tbl-date">'+d.dueDate+'</td>'+
       '<td class="amt">'+fmt(d.amount)+'</td>'+
       '<td class="amt" style="color:#e11d48;font-weight:500">'+(d.paid>0?'−'+fmt(d.paid):'$0')+'</td>'+
-      '<td class="amt" style="color:#4f46e5;font-weight:600">'+(d.pending>0?fmt(d.pending):'$0')+'</td>'+
+      '<td class="amt" style="color:#5b7fd4;font-weight:600">'+(d.pending>0?fmt(d.pending):'$0')+'</td>'+
       '<td class="center">'+badge(d.status)+'</td>'+
       '<td style="white-space:nowrap">'+d.priority+'</td>'+
       '<td class="tbl-date center">'+(d.pmtDate||'—')+'</td>'+
@@ -1021,7 +1021,7 @@ function renderAging(){
   if(agingSupInst){agingSupInst.destroy();agingSupInst=null;}
   var now=new Date().getTime();
   var bDefs=[
-    {label:'Not Yet Due',hex:'#4f46e5',items:[]},
+    {label:'Not Yet Due',hex:'#5b7fd4',items:[]},
     {label:'0–30 Days OD',hex:'#ca8a04',items:[]},
     {label:'31–60 Days OD',hex:'#e11d48',items:[]},
     {label:'61–90 Days OD',hex:'#7f1d1d',items:[]},
@@ -1072,7 +1072,7 @@ function renderAging(){
   var pRows=allData.filter(function(d){return d.pending>0;});
   var sOut=[];pRows.forEach(function(d){if(sOut.indexOf(d.supplier)<0) sOut.push(d.supplier);});
   var sVals=sOut.map(function(s){return pRows.filter(function(d){return d.supplier===s;}).reduce(function(a,d){return a+d.pending;},0);});
-  var bP=['#3730a3','#4f46e5','#6366f1','#818cf8','#a5b4fc','#c7d2fe','#eef2ff','#eef2ff'];
+  var bP=['#3b5bdb','#5b7fd4','#5b7fd4','#7ca3e8','#a8bfe8','#d0dcef','#eaf0fb','#eaf0fb'];
   agingSupInst=new Chart(document.getElementById('agingSupplier'),{
     type:'bar',
     data:{labels:sOut.map(function(s){return s.length>22?s.slice(0,20)+'…':s;}),datasets:[{label:'Outstanding USD',data:sVals,backgroundColor:sOut.map(function(s,i){return bP[i%bP.length];}),borderWidth:0,borderRadius:3}]},
@@ -1111,7 +1111,7 @@ function renderDetailTable(data){
       '<td class="tbl-date">'+d.dueDate+'</td>'+
       '<td class="amt">'+fmt(d.amount)+'</td>'+
       '<td class="amt" style="color:#e11d48;font-weight:500">'+(d.paid>0?'−'+fmt(d.paid):'$0')+'</td>'+
-      '<td class="amt" style="color:'+(d.pending>0?'#4f46e5':'var(--muted)')+'">'+fmt(d.pending)+'</td>'+
+      '<td class="amt" style="color:'+(d.pending>0?'#5b7fd4':'var(--muted)')+'">'+fmt(d.pending)+'</td>'+
       '<td class="center">'+badge(d.status)+'</td>'+
       '<td style="white-space:nowrap">'+d.priority+'</td>'+
       '<td class="tbl-date center">'+(d.pmtDate||'—')+'</td>'+
